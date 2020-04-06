@@ -43,11 +43,11 @@ class Admin(commands.Cog):
         try:
             await ctx.send(f"{content}")
         except discord.Forbidden:
-            return await arthur.send(":wdwaffleboterror: I couldn't say that because I don't have sufficient permissions")
+            return await arthur.send("<:error:696628928458129488> I couldn't say that because I don't have sufficient permissions")
         try:
-            ctx.message.delete()
+           await ctx.message.delete()
         except discord.Forbidden:
-            return await arthur.send(":wdwaffleboterror: I couldn't delete your invocation message because I don't have sufficient permissions")
+            return await arthur.send("<:error:696628928458129488> I couldn't delete your invocation message because I don't have sufficient permissions")
     
     @commands.command(hidden=True)
     @commands.is_owner()
