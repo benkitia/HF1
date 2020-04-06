@@ -6,8 +6,8 @@ config_prefix = '-'
 config_description = 'A multipurpose bot by Waffle Development'
 # a very breif description of the bot
 
-config_owner_id = 508350582457761813
-# user ID of the bot's owner
+config_owner_ids = 508350582457761813, 297567836254240768, 167726726451953664
+# user ID of the bot's owners
 
 config_bot_log_channel = 691373759893864529
 # channel ID for where bot events should be sent (bot logons and logoffs, command errors, etc.)

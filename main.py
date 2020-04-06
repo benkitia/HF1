@@ -2,11 +2,11 @@ import discord
 from discord.ext import commands
 from datetime import datetime, date, time
 import time
-from config import config_token, config_prefix, config_description, config_owner_id
+from config import config_token, config_prefix, config_description, config_owner_ids
 
 token = config_token
 
-bot = commands.Bot(command_prefix=config_prefix, description=config_description, owner_id=config_owner_id)
+bot = commands.Bot(command_prefix=config_prefix, description=config_description, owner_ids=config_owner_ids)
 
 cogs = ['cogs.admin']
 
