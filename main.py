@@ -7,7 +7,7 @@ token = 'NTgyMzgwOTM4NjY3ODg0NTQ4.XnfB7A.4_fWpCfLOCQ5VqJ0wcjeFgZuUNY'
 
 bot = commands.Bot(command_prefix='-', description='A multipurpose bot by Waffle Development', owner_id=508350582457761813)
 
-cogs = ['moderation']
+cogs = ['cogs.moderation','cogs.backend']
 
 @bot.event
 async def on_ready():
@@ -15,29 +15,15 @@ async def on_ready():
     print("______________")
     onready = discord.Embed(title="Bot logged on", description=f"{bot.user.name} ({bot.user.id}) is online",color=0x4bff92)
     onready.timestamp=datetime.utcnow()
-    log_channel = bot.get_channel(691373759893864529)
-    await log_channel.send(embed=onready)
     pstatus = f"eating breakfast"
     await bot.change_presence(activity=discord.Game(name=pstatus), status=discord.Status.online)
     print(f'\n Bot presence set to "{pstatus}"')
     print("______________")
     setstatus = discord.Embed(title="Bot presence set", description=f"Bot status set to `{pstatus}`", color=0xad6dff)
     setstatus.timestamp=datetime.utcnow()
-    await log_channel.send(embed=setstatus)
-    try:
-        for cog in cogs: 
-    	    bot.load_extension(cog)
-    except commands.ExtensionError as e:
-        extensionerror = discord.Embed(title="Command Error", description=
-        f"""
-        **Error loading extensons:** {e.__class__.__name__}: {e}
-        """,color=0xff7d51)
-        await log_channel.send(embed=extensionerror)
-    else:
-        loaded=discord.Embed(title="Cogs loaded",description="All extensions loaded successfully.",color=0x50beff)
-        loaded.timestamp=datetime.utcnow()
-        await log_channel.send(embed=loaded)
-
+    for cog in cogs: 
+    	bot.load_extension(cog)
+        
 @bot.command(hidden=True)
 @commands.is_owner()
 async def load(ctx, *, module):
