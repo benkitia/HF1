@@ -16,16 +16,16 @@ class Moderation(commands.Cog):
         **Responsible Moderator:** {ctx.message.author}
         """, color=0xff1919)
         if target == None:
-            await ctx.send(":x: You must provide a valid user to ban")
+            return await ctx.send(":x: You must provide a valid user to ban")
         if target == ctx.message.author:
-            await ctx.send(":x: You cannot ban yourself")
+            return await ctx.send(":x: You cannot ban yourself")
         try:
             await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")
             await ctx.send(f":ok_hand: Banned **{target}** for *{reason}*")
         except discord.Forbidden:
-            await ctx.send(":x: I can't ban this user, make sure my highest role is above their's and I have ban members permissions")
+            return await ctx.send(":x: I can't ban this user, make sure my highest role is above their's and I have ban members permissions")
         if not logchannel:
-            await ctx.send(":x: I couldn't log this action, create a channel called mod-log")
+            await ctx.send(":x: I couldn't log this action, no log channel found")
         else:
             try:
                 await logchannel.send(embed=banlog)
@@ -36,34 +36,53 @@ class Moderation(commands.Cog):
     @commands.has_permissions(ban_members=True)
     async def unban(self, ctx, id:int=None, reason=None):
         target = await self.bot.fetch_user(id)
-        if target == None:
-            await ctx.send(":x: You must provide a valid user to unban")
-        if target == ctx.message.author:
-            await ctx.send(":x: You cannot unban yourself")
-        await ctx.guild.unban(target, reason=f"Action by {ctx.message.author} for {reason}")
-        await ctx.send(f":ok_hand: Unbanned **{target}** for *{reason}*")
+        logchannel = discord.utils.get(ctx.guild.text_channels, name="mod-log")
         unbanlog = discord.Embed(title=f"{target} unbanned", description=f"""**User:** {target} ({id})
         **Reason:** {reason}
         **Responsible Moderator:** {ctx.message.author}
         """, color=0x6dff88)
-        logchannel = self.bot.get_channel(config_action_log_channel)
-        await logchannel.send(embed=unbanlog)
+        if target == None:
+            return await ctx.send(":x: You must provide a valid user to unban")
+        if target == ctx.message.author:
+            return await ctx.send(":x: You cannot unban yourself")
+        try:
+            await ctx.guild.unban(target, reason=f"Action by {ctx.message.author} for {reason}")
+            await ctx.send(f":ok_hand: Unbanned **{target}** for *{reason}*")
+        except discord.Forbidden:
+            return await ctx.send(":x: I can't unban this user, make sure I have ban members permissions")
+        if not logchannel:
+            await ctx.send(":x: I couldn't log this action, no log channel found")
+        else:
+            try:
+                await logchannel.send(embed=unbanlog)
+            except discord.Forbidden:
+                await ctx.send(":x: I can't log this action because I can't speak in the log channel")
+
 
     @commands.command(description="Kicks a user")
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, target:discord.User=None, reason=None):
-        if target ==  None:
-            await ctx.send(":x: You must be provide a balid user to kick")
-        if target == ctx.message.author:
-            await ctx.send(":x: You cannot kick yourself")
-        await ctx.guild.kick(target, reason=f"Action by {ctx.message.author} for {reason}")
-        await ctx.send(f":ok_hand: Kicked **{target}** for *{reason}*")
+        logchannel = discord.utils.get(ctx.guild.text_channels, name="mod-log")
         kicklog = discord.Embed(title=f"{target} kicked", description=f"""**User:** {target} ({target.id})
         **Reason:** {reason}
         **Responsible Moderator:** {ctx.message.author}
-        """, color=0xff1919)
-        logchannel = self.bot.get_channel(config_action_log_channel)
-        await logchannel.send(embed=kicklog)
+        """, color=0xff8500)
+        if target == None:
+            return await ctx.send(":x: You must provide a valid user to kick")
+        if target == ctx.message.author:
+            return await ctx.send(":x: You cannot kick yourself")
+        try:
+            await ctx.guild.kick(target, reason=f"Action by {ctx.message.author} for {reason}")
+            await ctx.send(f":ok_hand: Kicked **{target}** for *{reason}*")
+        except discord.Forbidden:
+            return await ctx.send(":x: I can't kick this user, make sure my highest role is above their's and I have kick members permissions")
+        if not logchannel:
+            await ctx.send(":x: I couldn't log this action, no log channel found")
+        else:
+            try:
+                await logchannel.send(embed=kicklog)
+            except discord.Forbidden:
+                await ctx.send(":x: I can't log this action because I can't speak in the log channel")
 
     @commands.command(description="Mutes a user")
     @commands.has_permissions(kick_members=True)
@@ -75,9 +94,9 @@ class Moderation(commands.Cog):
         **Responsible Moderator:** {ctx.message.author}
         """, color=0xff8500)
         if target == None:
-            await ctx.send(":x: You must provide a valid user to mute")
+            return await ctx.send(":x: You must provide a valid user to mute")
         if target == ctx.message.author:
-            await ctx.send(":x: You cannot mute yourself")
+            return await ctx.send(":x: You cannot mute yourself")
         if not muterole:
             await ctx.send(":x: No mute role found, create a role called Muted")
         else:
@@ -87,12 +106,68 @@ class Moderation(commands.Cog):
             except discord.Forbidden:
                 return await ctx.send(":x: I can't give this user the mute role, make sure my role is above the mute role") 
         if not logchannel:
-            await ctx.send(":x: I couldn't log this action, create a channel called mod-log")
+            await ctx.send(":x: I couldn't log this action, no log channel found")
         else:
             try:
                 await logchannel.send(embed=mutelog)
             except discord.Forbidden:
-                return await ctx.send(":x: I couldn't log this action because I can't send messages in the log channel")
+                await ctx.send(":x: I couldn't log this action because I can't send messages in the log channel")
+
+    @commands.command(description="Removes a user's mute")
+    @commands.has_permissions(kick_members=True)
+    async def unmute(self, ctx, target:discord.Member=None, reason=None):
+        muterole = discord.utils.get(ctx.guild.roles, name="Muted")
+        logchannel = discord.utils.get(ctx.guild.text_channels, name="mod-log")
+        unmutelog = discord.Embed(title=f"{target} unmuted", description=f"""**User:** {target} ({target.id})
+        **Reason:** {reason}
+        **Responsible Moderator:** {ctx.message.author}
+        """, color=0x6dff88)
+        if target == None:
+            return await ctx.send(":x: You must provide a valid user to unmute")
+        if target == ctx.message.author:
+            return await ctx.send(":x: You cannot unmute yourself")
+        if not muterole:
+            await ctx.send(":x: No mute role found, create a role called Muted")
+        else:
+            try:
+                await target.remove_roles(muterole, reason=f"User unmuted by {ctx.message.author} for {reason}")
+                await ctx.send(f":ok_hand: Unmuted **{target}** for *{reason}*")
+            except discord.Forbidden:
+                return await ctx.send(":x: I can't remove the mute role from this user, make sure my role is above the mute role") 
+        if not logchannel:
+            await ctx.send(":x: I couldn't log this action, no log channel found")
+        else:
+            try:
+                await logchannel.send(embed=unmutelog)
+            except discord.Forbidden:
+                await ctx.send(":x: I couldn't log this action because I can't send messages in the log channel")
+
+    @commands.command(description="Issues a user a warning")
+    @commands.has_permissions(kick_members=True)
+    async def warn(self, ctx, target:discord.Member=None, reason=None):
+        logchannel = discord.utils.get(ctx.guild.text_channels, name="mod-log")
+        warnlog = discord.Embed(title=f"{target} warned", description=f"""**User:** {target} ({target.id})
+        **Reason:** {reason}
+        **Responsible Moderator:** {ctx.message.author}
+        """, color=0xfff25f)
+        if target == None:
+            return await ctx.send(":x: You must provide a valid user to warn")
+        if target == ctx.message.author:
+           return await ctx.send(":x: You cannot warn yourself")
+        else:
+            try:
+                await target.send(f":warning: You've been warned for **{reason}** in **{ctx.message.guild}**")
+                await ctx.send(f":ok_hand: Warned **{target}** for *{reason}*")
+            except:
+                return await ctx.send(f":ok_hand: A warning has been added to **{target}** for *{reason}\n(I couldn't DM them to notify them of their warning)*") 
+        if not logchannel:
+            await ctx.send(":x: I couldn't log this action, no log channel found")
+        else:
+            try:
+                await logchannel.send(embed=warnlog)
+            except discord.Forbidden:
+                await ctx.send(":x: I couldn't log this action because I can't send messages in the log channel")
+
 
         
 
