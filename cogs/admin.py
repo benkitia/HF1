@@ -7,6 +7,7 @@ class Admin(commands.Cog):
         self.bot = bot
         
     @commands.command(hidden=True)
+    @commands.is_owner()
     async def load(self, ctx, *, module):
         try:
             self.bot.load_extension(f'cogs.{module}')
@@ -16,6 +17,7 @@ class Admin(commands.Cog):
             await ctx.send(f':ok_hand: Loaded extension: {module}')
 
     @commands.command(hidden=True)
+    @commands.is_owner()
     async def unload(self, ctx, *, module):
         try:
             self.bot.unload_extension(f'cogs.{module}')
@@ -25,6 +27,7 @@ class Admin(commands.Cog):
             await ctx.send(f':ok_hand: Unloaded extension: {module}')
 
     @commands.command(hidden=True)
+    @commands.is_owner()
     async def reload(self, ctx, *, module):
         try:
             self.bot.reload_extension(f'cogs.{module}')
@@ -34,6 +37,7 @@ class Admin(commands.Cog):
             await ctx.send(f':ok_hand: reloaded extension: {module}')
 
     @commands.command(hidden=True)
+    @commands.is_owner()
     async def say(self, ctx, *, content):
         arthur = ctx.message.author
         try:
