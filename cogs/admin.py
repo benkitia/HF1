@@ -1,5 +1,7 @@
 import discord
 from discord.ext import commands
+from config import config_prefix
+from copy import deepcopy
 
 class Admin(commands.Cog):
     
@@ -55,12 +57,12 @@ class Admin(commands.Cog):
         await self.bot.change_presence(activity=discord.Game(name=presence))
         await ctx.send(f":ok_hand: Bot presence set to `{presence}`")
 
-    @commands.command(aliases=['logout'], description="Logs the bot out")
+    @commands.command(aliases=['logout'], description="Logs the bot out", hidden=True)
     @commands.is_owner()
     async def close(self, ctx):
         await self.bot.close()
 
-    @commands.command(description="Sends a message to a user")
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def messageuser(self, ctx, member:discord.Member, *, message):
         try:
@@ -68,6 +70,14 @@ class Admin(commands.Cog):
             await ctx.send(f":incoming_envelope: Sent message to {member}: `{message}`")
         except:
             await ctx.send(":x: Failed to send message to {member.name}. Their DMs are likely closed.")
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def sudo(self, ctx, user: discord.Member, *, command):
+        new_msg = ctx.message
+        new_msg.author = user
+        new_msg.content = f"{config_prefix}{command}"
+        await self.bot.process_commands(new_msg)
 
         
 def setup(bot):
