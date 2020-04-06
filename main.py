@@ -2,10 +2,11 @@ import discord
 from discord.ext import commands
 from datetime import datetime, date, time
 import time
+from config import config_token, config_prefix, config_description, config_owner_id
 
-token = 'NTgyMzgwOTM4NjY3ODg0NTQ4.XnfB7A.4_fWpCfLOCQ5VqJ0wcjeFgZuUNY'
+token = config_token
 
-bot = commands.Bot(command_prefix='-', description='A multipurpose bot by Waffle Development', owner_id=508350582457761813)
+bot = commands.Bot(command_prefix=config_prefix, description=config_description, owner_id=config_owner_id)
 
 cogs = ['cogs.admin']
 

@@ -1,3 +1,14 @@
+config_token = 'NTgyMzgwOTM4NjY3ODg0NTQ4.XnfB7A.4_fWpCfLOCQ5VqJ0wcjeFgZuUNY'
+
+config_prefix = '-'
+# the charectar(s) preceding a command to define a message as a command
+
+config_description = 'A multipurpose bot by Waffle Development'
+# a very breif description of the bot
+
+config_owner_id = 508350582457761813
+# user ID of the bot's owner
+
 config_bot_log_channel = 691373759893864529
 # channel ID for where bot events should be sent (bot logons and logoffs, command errors, etc.)
 
