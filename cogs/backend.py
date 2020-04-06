@@ -11,7 +11,7 @@ class Backend(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        await ctx.send(f":wdwaffleboterror: Error: {error}")
+        await ctx.send(f"<:error:696628928458129488> Error: {error}")
         logchannel = self.bot.get_channel(config_bot_log_channel)
         errorembed = discord.Embed(title="Command Error",description=f"**Error:** ```{error}```\n**Server:** {ctx.message.guild} ({ctx.message.guild.id})\n**Channel:** <#{ctx.message.channel.id}>- {ctx.message.channel} ({ctx.message.channel.id})\n**User:** {ctx.message.author} ({ctx.message.author.id})", color=0xff0000)
         errorembed.timestamp=datetime.utcnow()

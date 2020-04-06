@@ -16,21 +16,21 @@ class Moderation(commands.Cog):
         **Responsible Moderator:** {ctx.message.author}
         """, color=0xff1919)
         if target == None:
-            return await ctx.send(":wdwaffleboterror: You must provide a valid user to ban")
+            return await ctx.send("<:error:696628928458129488> You must provide a valid user to ban")
         if target == ctx.message.author:
-            return await ctx.send(":wdwaffleboterror: You cannot ban yourself")
+            return await ctx.send("<:error:696628928458129488> You cannot ban yourself")
         try:
             await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")
             await ctx.send(f":ok_hand: Banned **{target}** for *{reason}*")
         except discord.Forbidden:
-            return await ctx.send(":wdwaffleboterror: I can't ban this user, make sure my highest role is above their's and I have ban members permissions")
+            return await ctx.send("<:error:696628928458129488> I can't ban this user, make sure my highest role is above their's and I have ban members permissions")
         if not logchannel:
-            await ctx.send(":wdwaffleboterror: I couldn't log this action, no log channel found")
+            await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
             try:
                 await logchannel.send(embed=banlog)
             except discord.Forbidden:
-                await ctx.send(":wdwaffleboterror: I can't log this action because I can't speak in the log channel")
+                await ctx.send("<:error:696628928458129488> I can't log this action because I can't speak in the log channel")
 
     @commands.command(description="Removes a user's ban")
     @commands.has_permissions(ban_members=True)
@@ -42,21 +42,21 @@ class Moderation(commands.Cog):
         **Responsible Moderator:** {ctx.message.author}
         """, color=0x6dff88)
         if target == None:
-            return await ctx.send(":wdwaffleboterror: You must provide a valid user to unban")
+            return await ctx.send("<:error:696628928458129488> You must provide a valid user to unban")
         if target == ctx.message.author:
-            return await ctx.send(":wdwaffleboterror: You cannot unban yourself")
+            return await ctx.send("<:error:696628928458129488> You cannot unban yourself")
         try:
             await ctx.guild.unban(target, reason=f"Action by {ctx.message.author} for {reason}")
             await ctx.send(f":ok_hand: Unbanned **{target}** for *{reason}*")
         except discord.Forbidden:
-            return await ctx.send(":wdwaffleboterror: I can't unban this user, make sure I have ban members permissions")
+            return await ctx.send("<:error:696628928458129488> I can't unban this user, make sure I have ban members permissions")
         if not logchannel:
-            await ctx.send(":wdwaffleboterror: I couldn't log this action, no log channel found")
+            await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
             try:
                 await logchannel.send(embed=unbanlog)
             except discord.Forbidden:
-                await ctx.send(":wdwaffleboterror: I can't log this action because I can't speak in the log channel")
+                await ctx.send("<:error:696628928458129488> I can't log this action because I can't speak in the log channel")
 
 
     @commands.command(description="Kicks a user")
@@ -68,21 +68,21 @@ class Moderation(commands.Cog):
         **Responsible Moderator:** {ctx.message.author}
         """, color=0xff8500)
         if target == None:
-            return await ctx.send(":wdwaffleboterror: You must provide a valid user to kick")
+            return await ctx.send("<:error:696628928458129488> You must provide a valid user to kick")
         if target == ctx.message.author:
-            return await ctx.send(":wdwaffleboterror: You cannot kick yourself")
+            return await ctx.send("<:error:696628928458129488> You cannot kick yourself")
         try:
             await ctx.guild.kick(target, reason=f"Action by {ctx.message.author} for {reason}")
             await ctx.send(f":ok_hand: Kicked **{target}** for *{reason}*")
         except discord.Forbidden:
-            return await ctx.send(":wdwaffleboterror: I can't kick this user, make sure my highest role is above their's and I have kick members permissions")
+            return await ctx.send("<:error:696628928458129488> I can't kick this user, make sure my highest role is above their's and I have kick members permissions")
         if not logchannel:
-            await ctx.send(":wdwaffleboterror: I couldn't log this action, no log channel found")
+            await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
             try:
                 await logchannel.send(embed=kicklog)
             except discord.Forbidden:
-                await ctx.send(":wdwaffleboterror: I can't log this action because I can't speak in the log channel")
+                await ctx.send("<:error:696628928458129488> I can't log this action because I can't speak in the log channel")
 
     @commands.command(description="Mutes a user")
     @commands.has_permissions(kick_members=True)
@@ -94,24 +94,24 @@ class Moderation(commands.Cog):
         **Responsible Moderator:** {ctx.message.author}
         """, color=0xff8500)
         if target == None:
-            return await ctx.send(":wdwaffleboterror: You must provide a valid user to mute")
+            return await ctx.send("<:error:696628928458129488> You must provide a valid user to mute")
         if target == ctx.message.author:
-            return await ctx.send(":wdwaffleboterror: You cannot mute yourself")
+            return await ctx.send("<:error:696628928458129488> You cannot mute yourself")
         if not muterole:
-            await ctx.send(":wdwaffleboterror: No mute role found, create a role called Muted")
+            await ctx.send("<:error:696628928458129488> No mute role found, create a role called Muted")
         else:
             try:
                 await target.add_roles(muterole, reason=f"User muted by {ctx.message.author} for {reason}")
                 await ctx.send(f":ok_hand: Muted **{target}** for *{reason}*")
             except discord.Forbidden:
-                return await ctx.send(":wdwaffleboterror: I can't give this user the mute role, make sure my role is above the mute role") 
+                return await ctx.send("<:error:696628928458129488> I can't give this user the mute role, make sure my role is above the mute role") 
         if not logchannel:
-            await ctx.send(":wdwaffleboterror: I couldn't log this action, no log channel found")
+            await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
             try:
                 await logchannel.send(embed=mutelog)
             except discord.Forbidden:
-                await ctx.send(":wdwaffleboterror: I couldn't log this action because I can't send messages in the log channel")
+                await ctx.send("<:error:696628928458129488> I couldn't log this action because I can't send messages in the log channel")
 
     @commands.command(description="Removes a user's mute")
     @commands.has_permissions(kick_members=True)
@@ -123,24 +123,24 @@ class Moderation(commands.Cog):
         **Responsible Moderator:** {ctx.message.author}
         """, color=0x6dff88)
         if target == None:
-            return await ctx.send(":wdwaffleboterror: You must provide a valid user to unmute")
+            return await ctx.send("<:error:696628928458129488> You must provide a valid user to unmute")
         if target == ctx.message.author:
-            return await ctx.send(":wdwaffleboterror: You cannot unmute yourself")
+            return await ctx.send("<:error:696628928458129488> You cannot unmute yourself")
         if not muterole:
-            await ctx.send(":wdwaffleboterror: No mute role found, create a role called Muted")
+            await ctx.send("<:error:696628928458129488> No mute role found, create a role called Muted")
         else:
             try:
                 await target.remove_roles(muterole, reason=f"User unmuted by {ctx.message.author} for {reason}")
                 await ctx.send(f":ok_hand: Unmuted **{target}** for *{reason}*")
             except discord.Forbidden:
-                return await ctx.send(":wdwaffleboterror: I can't remove the mute role from this user, make sure my role is above the mute role") 
+                return await ctx.send("<:error:696628928458129488> I can't remove the mute role from this user, make sure my role is above the mute role") 
         if not logchannel:
-            await ctx.send(":wdwaffleboterror: I couldn't log this action, no log channel found")
+            await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
             try:
                 await logchannel.send(embed=unmutelog)
             except discord.Forbidden:
-                await ctx.send(":wdwaffleboterror: I couldn't log this action because I can't send messages in the log channel")
+                await ctx.send("<:error:696628928458129488> I couldn't log this action because I can't send messages in the log channel")
 
     @commands.command(description="Issues a user a warning")
     @commands.has_permissions(kick_members=True)
@@ -151,9 +151,9 @@ class Moderation(commands.Cog):
         **Responsible Moderator:** {ctx.message.author}
         """, color=0xfff25f)
         if target == None:
-            return await ctx.send(":wdwaffleboterror: You must provide a valid user to warn")
+            return await ctx.send("<:error:696628928458129488> You must provide a valid user to warn")
         if target == ctx.message.author:
-           return await ctx.send(":wdwaffleboterror: You cannot warn yourself")
+           return await ctx.send("<:error:696628928458129488> You cannot warn yourself")
         else:
             try:
                 await target.send(f":warning: You've been warned for **{reason}** in **{ctx.message.guild}**")
@@ -161,12 +161,12 @@ class Moderation(commands.Cog):
             except:
                 return await ctx.send(f":ok_hand: A warning has been added to **{target}** for *{reason}\n(I couldn't DM them to notify them of their warning)*") 
         if not logchannel:
-            await ctx.send(":wdwaffleboterror: I couldn't log this action, no log channel found")
+            await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
             try:
                 await logchannel.send(embed=warnlog)
             except discord.Forbidden:
-                await ctx.send(":wdwaffleboterror: I couldn't log this action because I can't send messages in the log channel")
+                await ctx.send("<:error:696628928458129488> I couldn't log this action because I can't send messages in the log channel")
 
 
         
