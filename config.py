@@ -6,8 +6,17 @@ config_prefix = '-'
 config_description = 'A multipurpose bot by Waffle Development'
 # a very breif description of the bot
 
-config_owner_ids = 508350582457761813, 297567836254240768, 167726726451953664
-# user ID of the bot's owners
+config_dev_ids = [508350582457761813, 297567836254240768, 167726726451953664]
+# please leave this alone
+
+config_owner_ids = [508350582457761813, 297567836254240768, 167726726451953664]
+# user ID of the bot's owners/global admins
+
+config_support_ids = [508350582457761813, 73502284083900416]
+# please leave this alone, it does not grant extra permissions
+
+config_tester_ids = [477556772220043278, 615089766404325386, 380882346737664022, 409092993094516737]
+# please leave this alone, it does not grant extra permissions
 
 config_bot_log_channel = 691373759893864529
 # channel ID for where bot events should be sent (bot logons and logoffs, command errors, etc.)

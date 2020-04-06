@@ -20,7 +20,9 @@ class Basic(commands.Cog):
     async def botinfo(self, ctx):
         botinfoem = discord.Embed(title="Bot Information",description=f"""
         {self.bot.user.name} is based on Wafflebot, a moderation and utility bot by Waffle Development written in [discord.py](https://github.com/Rapptz/discord.py)
+
         For general support with commands and bot functions join the Waffle Development Discord server: https://discord.gg/zrBqN2v
+        
         For support with the bot's configuration or to report any bugs or add the bot to your own server join the server above or email support@waffledev.xyz
         """, color=0x5c92ff)
         botinfoem.add_field(name = "Docs:", value = "https://waffledev.xyz/wafflebot", inline = False)
