@@ -26,3 +26,6 @@ config_user_log_channel = 643192386834399262
 
 config_mute_role = 670484247303159819
 #role ID for the role assigned to users when muted; this role should restrict users from speaking
+
+config_alert_channel = 591094881536180225
+# channel ID for where actionable alert messages should be sent (filter triggers, modmails, etc.)
