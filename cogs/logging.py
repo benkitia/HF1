@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from config import config_message_log_channel, config_guild_id
+import datetime
 
 class Logging(commands.Cog):
     
@@ -9,14 +10,16 @@ class Logging(commands.Cog):
         
     @commands.Cog.listener()
     async def on_message_delete(self, message):
-        if message.guild is None or config_message_log_channel is None:
+        if message.guild != config_guild_id or config_message_log_channel is None or message.author.bot:
             return
         ctx: commands.Context = await self.bot.get_context(message)
         logchannel = self.bot.get_channel(config_message_log_channel)
         msgdellogem = discord.Embed(title=f"Message deleted in #{ctx.message.channel}", description=f"""
         **Author:** {ctx.message.author} ({ctx.message.author.id})
         **Content:** ```{ctx.message.content}```
+        **Message ID:** {ctx.message.id}
         """, color=0xff1919)
+        msgdellogem.timestamp = datetime.datetime.utcnow()
         await logchannel.send(embed=msgdellogem)
 
     @commands.Cog.listener()
@@ -29,7 +32,9 @@ class Logging(commands.Cog):
         **Author:** {ctx.message.author} ({ctx.message.author.id})
         **Before:** ```{before.content}```
         **After:** ```{after.content}```
+        **Message ID:** {ctx.message.id}
         """, color=0xff8500)
+        msgeditlogem.timestamp = datetime.datetime.utcnow()
         await logchannel.send(embed=msgeditlogem)
 
 def setup(bot):
