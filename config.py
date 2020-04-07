@@ -6,6 +6,9 @@ config_prefix = '-'
 config_description = 'A multipurpose bot by Waffle Development'
 # a very breif description of the bot
 
+config_guild_id = 531247466180378656
+# the ID of the guild (server) the bot will be used in
+
 config_dev_ids = [508350582457761813, 297567836254240768, 167726726451953664]
 # please leave this alone
 
