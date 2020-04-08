@@ -102,6 +102,7 @@ class Moderation(commands.Cog):
         else:
             try:
                 await target.add_roles(muterole, reason=f"User muted by {ctx.message.author} for {reason}")
+                await target.mute(reason=f"User muted by {ctx.message.author} for {reason}")
                 await ctx.send(f":ok_hand: Muted **{target}** for *{reason}*")
             except discord.Forbidden:
                 return await ctx.send("<:error:696628928458129488> I can't give this user the mute role, make sure my role is above the mute role") 
