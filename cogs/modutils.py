@@ -30,5 +30,9 @@ class Modutils(commands.Cog):
         userinfoem.set_footer(text=f"Requested by {ctx.message.author}")
         await ctx.send(embed = userinfoem)
 
+    @commands.command(aliases=['purge','purgeall'])
+    async def clear(self, ctx, amount=10):
+        await ctx.channel.purge(limit=amount+1)
+
 def setup(bot):
     bot.add_cog(Modutils(bot))
