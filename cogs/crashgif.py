@@ -1,8 +1,8 @@
 
+from io import BytesIO
 from discord.ext import commands
 import discord
 import hashlib
-import requests
 
 class Crashgif(commands.Cog):
     def __init__(self, bot):
@@ -25,14 +25,22 @@ class Crashgif(commands.Cog):
             urls.add(a.proxy_url)
 
         for url in urls:
+            buffer = BytesIO()
 
-            res = requests.get(url)
+            async with self.bot.session.get(url) as resp:
+                if resp.status != 200:
+                    break
 
-            if res.status_code != 200:
-                break
+                while True:
+                    chunk = await resp.content.read(10)
+                    if not chunk:
+                        break
+                    buffer.write(chunk)
+
+            buffer.seek(0)
 
             m = hashlib.sha256()
-            m.update(res.content)
+            m.update(buffer.getvalue())
             hdg = m.hexdigest()
 
             print(hdg)
