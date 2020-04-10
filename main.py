@@ -1,8 +1,13 @@
 import os
+import sys
+import asyncio
 import discord
 from discord.ext import commands
 from datetime import datetime
 from config import Config
+
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from pymongo.errors import ServerSelectionTimeoutError
 
 DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")
 
@@ -12,6 +17,8 @@ BOT_MESSAGE_LOG_CHANNEL = int(os.environ.get("BOT_MESSAGE_LOG_CHANNEL"))
 BOT_SERVER_LOG_CHANNEL = int(os.environ.get("BOT_SERVER_LOG_CHANNEL"))
 BOT_USER_LOG_CHANNEL = int(os.environ.get("BOT_USER_LOG_CHANNEL"))
 BOT_ALERT_CHANNEL = int(os.environ.get("BOT_ALERT_CHANNEL"))
+
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb://127.0.0.1")
 
 cogs = ['cogs.admin']
 
@@ -29,6 +36,7 @@ class WaffleBot(commands.Bot):
             )
 
         self.config = Config()
+        self.db: AsyncIOMotorDatabase
 
         for cog in cogs:
             self.load_extension(cog)
@@ -69,7 +77,22 @@ class WaffleBot(commands.Bot):
         setstatus = discord.Embed(title="Bot presence set", description=f"Bot status set to `{pstatus}`", color=0xad6dff)
         setstatus.timestamp=datetime.utcnow()
 
+    async def init_mongo(self) -> None:
+        mongo = AsyncIOMotorClient(MONGO_URI)
+        # motor doesnt attempt a connection until you try to do something
+        await mongo.admin.command("ismaster")
+        self.db = mongo.wafflebot
+        print("Connected to mongo")
+
 
 if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
     bot = WaffleBot()
+
+    try:
+        loop.run_until_complete(bot.init_mongo())
+    except ServerSelectionTimeoutError:
+        print("Could not connect to mongo, timed out\nExiting.")
+        sys.exit(0)
+
     bot.run(DISCORD_TOKEN)
