@@ -78,11 +78,15 @@ class WaffleBot(commands.Bot):
         setstatus.timestamp=datetime.utcnow()
 
     async def init_mongo(self) -> None:
-        mongo = AsyncIOMotorClient(MONGO_URI)
+        self.mongo = AsyncIOMotorClient(MONGO_URI)
         # motor doesnt attempt a connection until you try to do something
-        await mongo.admin.command("ismaster")
-        self.db = mongo.wafflebot
+        await self.mongo.admin.command("ismaster")
+        self.db = self.mongo.wafflebot
         print("Connected to mongo")
+
+    async def close(self):
+        await super().close()
+        self.mongo.close()
 
 
 if __name__ == "__main__":
