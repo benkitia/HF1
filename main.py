@@ -22,9 +22,9 @@ async def on_ready():
     print("______________")
     setstatus = discord.Embed(title="Bot presence set", description=f"Bot status set to `{pstatus}`", color=0xad6dff)
     setstatus.timestamp=datetime.utcnow()
-    for cog in cogs: 
+    for cog in cogs:
     	bot.load_extension(cog)
-        
+
 
 @bot.command(hidden=True)
 async def test(ctx):
