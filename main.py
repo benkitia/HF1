@@ -6,6 +6,8 @@ from discord.ext import commands
 from datetime import datetime
 from config import Config
 
+from aiohttp import ClientSession
+
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pymongo.errors import ServerSelectionTimeoutError
 
@@ -77,6 +79,9 @@ class WaffleBot(commands.Bot):
         setstatus = discord.Embed(title="Bot presence set", description=f"Bot status set to `{pstatus}`", color=0xad6dff)
         setstatus.timestamp=datetime.utcnow()
 
+    async def init_http(self):
+        self.session = ClientSession()
+
     async def init_mongo(self) -> None:
         self.mongo = AsyncIOMotorClient(MONGO_URI)
         # motor doesnt attempt a connection until you try to do something
@@ -86,12 +91,15 @@ class WaffleBot(commands.Bot):
 
     async def close(self):
         await super().close()
+        await self.session.close()
         self.mongo.close()
 
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     bot = WaffleBot()
+
+    loop.run_until_complete(bot.init_http())
 
     try:
         loop.run_until_complete(bot.init_mongo())
