@@ -1,43 +1,23 @@
-config_token = 'NTgyMzgwOTM4NjY3ODg0NTQ4.XnfB7A.4_fWpCfLOCQ5VqJ0wcjeFgZuUNY'
+import os
 
-config_prefix = '-'
-# the charectar(s) preceding a command to define a message as a command
+BOT_GUILD_ID = int(os.environ.get("BOT_GUILD_ID"))
+BOT_MUTE_ROLE = int(os.environ.get("BOT_MUTE_ROLE"))
 
-config_description = 'A multipurpose bot by Waffle Development'
-# a very breif description of the bot
-
-config_guild_id = 531247466180378656
-# the ID of the guild (server) the bot will be used in
-
-config_dev_ids = [508350582457761813, 297567836254240768, 167726726451953664]
-# please leave this alone
-
-config_owner_ids = [508350582457761813, 297567836254240768, 167726726451953664]
-# user ID of the bot's owners/global admins
-
-config_support_ids = [508350582457761813, 73502284083900416]
-# please leave this alone, it does not grant extra permissions
-
-config_tester_ids = [477556772220043278, 615089766404325386, 380882346737664022, 409092993094516737]
-# please leave this alone, it does not grant extra permissions
-
-config_bot_log_channel = 691373759893864529
-# channel ID for where bot events should be sent (bot logons and logoffs, command errors, etc.)
-
-config_action_log_channel = 692600577451884597
-# channel ID for where moderation action logs should be sent (kicks, bans, mutes, etc.)
-
-config_message_log_channel = 643192386834399262
-# channel ID for where message change logs should be sent (message edits and deletion)
-
-config_server_log_channel =643192386834399262
-# channel ID for where server change logs should be sent (role edits, channel creations, server name changes, etc.)
-
-config_user_log_channel = 643192386834399262
-# channel ID for where user change logs should be sent (nickname and username changes, user role changes, join + leaves, etc.)
-
-config_mute_role = 670484247303159819
-#role ID for the role assigned to users when muted; this role should restrict users from speaking
-
-config_alert_channel = 591094881536180225
-# channel ID for where actionable alert messages should be sent (filter triggers, modmails, etc.)
+class Config:
+    tester = [
+            477556772220043278, # Avocado#5614
+            615089766404325386, # Deadones#1090
+            380882346737664022, # jemes#5573
+            409092993094516737  # ppiso#8682
+        ]
+    support = [
+            508350582457761813, # waffles#4918
+            73502284083900416   # xlite#1709
+        ]
+    dev = [
+            508350582457761813, # waffles#4918
+            297567836254240768, # Moo#8008
+            167726726451953664  # derw#0387
+        ]
+    guild_id = BOT_GUILD_ID
+    mute_role = BOT_MUTE_ROLE
