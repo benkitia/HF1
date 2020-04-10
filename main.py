@@ -1,8 +1,7 @@
 import os
 import discord
 from discord.ext import commands
-from datetime import datetime, date, time
-import time
+from datetime import datetime
 from config import Config
 
 DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")
