@@ -1,13 +1,12 @@
 import discord
 from discord.ext import commands
-from config import config_prefix
 from copy import deepcopy
 
 class Admin(commands.Cog):
-    
+
     def __init__(self, bot):
         self.bot = bot
-        
+
     @commands.command(hidden=True)
     @commands.is_owner()
     async def load(self, ctx, *, module):
@@ -50,7 +49,7 @@ class Admin(commands.Cog):
            await ctx.message.delete()
         except discord.Forbidden:
             return await arthur.send("<:error:696628928458129488> I couldn't delete your invocation message because I don't have sufficient permissions")
-    
+
     @commands.command(hidden=True)
     @commands.is_owner()
     async def setpresence(self, ctx, *, presence):
@@ -76,9 +75,9 @@ class Admin(commands.Cog):
     async def sudo(self, ctx, user: discord.Member, *, command):
         new_msg = ctx.message
         new_msg.author = user
-        new_msg.content = f"{config_prefix}{command}"
+        new_msg.content = f"{ctx.prefix}{command}"
         await self.bot.process_commands(new_msg)
 
-        
+
 def setup(bot):
     bot.add_cog(Admin(bot))

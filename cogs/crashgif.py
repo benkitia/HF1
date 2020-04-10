@@ -1,9 +1,8 @@
-  
+
 from discord.ext import commands
 import discord
 import hashlib
 import requests
-from config import config_alert_channel, config_mute_role
 
 class Crashgif(commands.Cog):
     def __init__(self, bot):
@@ -50,11 +49,11 @@ class Crashgif(commands.Cog):
                     except Exception as e:
                         print(e)
 
-                role = guild.get_role(config_mute_role)
+                role = guild.get_role(self.bot.config.mute_role)
                 await author.add_roles(role)
 
                 await self.sendEmbed(msg.author, msg.channel)
-    
+
     async def sendEmbed(self, user, chnl):
         em = discord.Embed (
             title = "iOS Crash Gif Detected",
@@ -62,7 +61,7 @@ class Crashgif(commands.Cog):
             colour = discord.Colour.red()
         )
 
-        queue = self.bot.get_channel(config_alert_channel)
+        queue = self.bot.alert_channel
 
         await queue.send("@here", embed = em)
         await queue.send(f"{user.id}")

@@ -1,12 +1,11 @@
 import discord
 from discord.ext import commands
-from config import config_action_log_channel, config_mute_role
 
 class Moderation(commands.Cog):
-    
+
     def __init__(self, bot):
         self.bot = bot
-        
+
     @commands.command(description="Bans a user")
     @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, target:discord.User=None, reason=None):
@@ -105,7 +104,7 @@ class Moderation(commands.Cog):
                 await target.mute(reason=f"User muted by {ctx.message.author} for {reason}")
                 await ctx.send(f":ok_hand: Muted **{target}** for *{reason}*")
             except discord.Forbidden:
-                return await ctx.send("<:error:696628928458129488> I can't give this user the mute role, make sure my role is above the mute role") 
+                return await ctx.send("<:error:696628928458129488> I can't give this user the mute role, make sure my role is above the mute role")
         if not logchannel:
             await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
@@ -134,7 +133,7 @@ class Moderation(commands.Cog):
                 await target.remove_roles(muterole, reason=f"User unmuted by {ctx.message.author} for {reason}")
                 await ctx.send(f":ok_hand: Unmuted **{target}** for *{reason}*")
             except discord.Forbidden:
-                return await ctx.send("<:error:696628928458129488> I can't remove the mute role from this user, make sure my role is above the mute role") 
+                return await ctx.send("<:error:696628928458129488> I can't remove the mute role from this user, make sure my role is above the mute role")
         if not logchannel:
             await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
@@ -160,7 +159,7 @@ class Moderation(commands.Cog):
                 await target.send(f":warning: You've been warned for **{reason}** in **{ctx.message.guild}**")
                 await ctx.send(f":ok_hand: Warned **{target}** for *{reason}*")
             except:
-                return await ctx.send(f":ok_hand: A warning has been added to **{target}** for *{reason}\n(I couldn't DM them to notify them of their warning)*") 
+                return await ctx.send(f":ok_hand: A warning has been added to **{target}** for *{reason}\n(I couldn't DM them to notify them of their warning)*")
         if not logchannel:
             await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
@@ -170,7 +169,7 @@ class Moderation(commands.Cog):
                 await ctx.send("<:error:696628928458129488> I couldn't log this action because I can't send messages in the log channel")
 
 
-        
+
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
