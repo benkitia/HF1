@@ -14,6 +14,8 @@ class Modutils(commands.Cog):
 
     @commands.command(description="Returns information about a user", aliases=['profile','info'])
     async def userinfo(self, ctx, user:discord.Member):
+        inf_count = collection.count_documents({"Target":user.id, "Guild":ctx.message.guild.id,"Status":"Active"})
+        global_inf_count = collection.count_documents({"Target":user.id, "Status":"Active"})
         userinfoem = discord.Embed(title=f"{user}", colour=0xa558ff)
         userinfoem.add_field(name = "Name: ", value = user.name, inline = True)
         userinfoem.add_field(name = "ID: ", value = user.id, inline = True)
@@ -21,6 +23,8 @@ class Modutils(commands.Cog):
         userinfoem.add_field(name = "Highest Role: ", value = user.top_role)
         userinfoem.add_field(name = "Joined at: ", value = user.joined_at)
         userinfoem.add_field(name = "Created at: ", value = user.created_at)
+        userinfoem.add_field(name = "Infractions: ", value = inf_count)
+        userinfoem.add_field(name = "Global Infractions: ", value = global_inf_count)
         specials = ""
         if user.id in self.bot.config.dev:
             specials = "Developer"
