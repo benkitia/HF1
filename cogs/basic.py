@@ -2,6 +2,12 @@ import discord
 from discord.ext import commands
 from datetime import datetime, date, time
 import time
+import pymongo
+from pymongo import MongoClient
+
+cluster = MongoClient("mongodb+srv://wafflebot:fkKi2m2Eg2UjjJWZHiBVuWihAi9fdHpw@waffledev.derw.xyz/?ssl=false")
+db = cluster["wafflebot"]
+collection = db["infractions"]
 
 class Basic(commands.Cog):
 
