@@ -59,7 +59,7 @@ class Basic(commands.Cog):
         guild = ctx.guild
         server_inf_count = collection.count_documents({"Guild":guild.id})
         findbots = sum(1 for member in ctx.guild.members if member.bot)
-        iconurl = guild.icon_url_as(format='webp')
+        iconurl = guild.icon_url_as(format='png')
         serverinfoem=discord.Embed(title=guild.name, color=0xFED870)
         serverinfoem.add_field(name="Server ID", value=ctx.guild.id, inline=True)
         serverinfoem.add_field(name="Owner", value=ctx.guild.owner, inline=True)
