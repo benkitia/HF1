@@ -25,16 +25,6 @@ class Modutils(commands.Cog):
         userinfoem.add_field(name = "Created at: ", value = user.created_at)
         userinfoem.add_field(name = "Infractions: ", value = inf_count)
         userinfoem.add_field(name = "Global Infractions: ", value = global_inf_count)
-        specials = ""
-        if user.id in self.bot.config.dev:
-            specials = "Developer"
-        if user.id in self.bot.owner_ids or user.id == self.bot.owner_id:
-            specials = f"{specials}, Global Admin"
-        if user.id in self.bot.config.support:
-            specials = f"{specials}, Official Bot Support"
-        if user.id in self.bot.config.tester:
-            specials = f"{specials}, Beta Tester"
-        userinfoem.add_field(name = "Acknowledgements:", value = specials)
         userinfoem.set_thumbnail(url=user.avatar_url)
         userinfoem.set_footer(text=f"Requested by {ctx.message.author}")
         await ctx.send(embed = userinfoem)
