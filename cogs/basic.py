@@ -38,9 +38,15 @@ class Basic(commands.Cog):
         """, inline = False)
         await ctx.send(embed=botinfoem)
 
-    @commands.command(hidden=True)
-    async def test(self, ctx):
-        await ctx.send(":waffle:")
+    @commands.command()
+    async def avatar(self, ctx, user:discord.Member=None, avi_format='png'):
+        if user==None:
+            user = ctx.message.author
+        try:
+            avi = user.avatar_url_as(format=avi_format)
+            await ctx.send(avi)
+        except:
+            return await ctx.send("<:error:696628928458129488> Invalid format. Valid formats include ‘webp’, ‘jpeg’, ‘jpg’, ‘png’ or ‘gif’ (for animated avatars)")
 
 def setup(bot):
     bot.add_cog(Basic(bot))
