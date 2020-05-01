@@ -38,7 +38,7 @@ class Basic(commands.Cog):
         """, inline = False)
         await ctx.send(embed=botinfoem)
 
-    @commands.command()
+    @commands.command(description="Returns a user's avatar in one of many formats")
     async def avatar(self, ctx, user:discord.Member=None, avi_format='png'):
         if user==None:
             user = ctx.message.author
