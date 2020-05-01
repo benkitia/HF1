@@ -13,7 +13,9 @@ class Modutils(commands.Cog):
         self.bot = bot
 
     @commands.command(description="Returns information about a user", aliases=['profile','info'])
-    async def userinfo(self, ctx, user:discord.Member):
+    async def userinfo(self, ctx, user:discord.Member=None):
+        if user==None:
+            user = ctx.message.author
         inf_count = collection.count_documents({"Target":user.id, "Guild":ctx.message.guild.id,"Status":"Active"})
         global_inf_count = collection.count_documents({"Target":user.id, "Status":"Active"})
         userinfoem = discord.Embed(title=f"{user}", colour=0xa558ff)
