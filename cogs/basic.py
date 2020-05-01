@@ -48,5 +48,25 @@ class Basic(commands.Cog):
         except:
             return await ctx.send("<:error:696628928458129488> Invalid format. Valid formats include ‘webp’, ‘jpeg’, ‘jpg’, ‘png’ or ‘gif’ (for animated avatars)")
 
+    @commands.command(description="Returns information about a server")
+    async def serverinfo(self, ctx):
+        guild = ctx.guild
+        server_inf_count = collection.count_documents({"Guild":guild.id})
+        findbots = sum(1 for member in ctx.guild.members if member.bot)
+        iconurl = guild.icon_url_as(format='webp')
+        serverinfoem=discord.Embed(title=guild.name, color=0xFED870)
+        serverinfoem.add_field(name="Server ID", value=ctx.guild.id, inline=True)
+        serverinfoem.add_field(name="Owner", value=ctx.guild.owner, inline=True)
+        serverinfoem.add_field(name="Members", value=ctx.guild.member_count, inline=True)
+        serverinfoem.add_field(name="Bots", value=findbots, inline=True)
+        serverinfoem.add_field(name="Channels", value=len(guild.channels))
+        serverinfoem.add_field(name="Region", value=ctx.guild.region, inline=True)
+        serverinfoem.add_field(name="Verification Level", value=guild.verification_level)
+        serverinfoem.add_field(name="Server Infractions", value=server_inf_count, inline=True)
+        serverinfoem.add_field(name="Created At", value=guild.created_at)
+        serverinfoem.set_footer(text=f"Requested by {ctx.message.author}")
+        serverinfoem.set_thumbnail(url=iconurl)
+        await ctx.send(embed=serverinfoem)
+
 def setup(bot):
     bot.add_cog(Basic(bot))
