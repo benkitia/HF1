@@ -18,7 +18,7 @@ class Modutils(commands.Cog):
             user = ctx.message.author
         inf_count = collection.count_documents({"Target":user.id, "Guild":ctx.message.guild.id,"Status":"Active"})
         global_inf_count = collection.count_documents({"Target":user.id, "Status":"Active"})
-        userinfoem = discord.Embed(title=f"{user}", colour=0xa558ff)
+        userinfoem = discord.Embed(title=f"{user}", colour=user.color)
         userinfoem.add_field(name = "Name: ", value = user.name, inline = True)
         userinfoem.add_field(name = "ID: ", value = user.id, inline = True)
         userinfoem.add_field(name = "Status: ", value = user.status, inline = True)
