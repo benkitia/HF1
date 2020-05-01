@@ -77,6 +77,23 @@ class Admin(commands.Cog):
         new_msg.content = f"{ctx.prefix}{command}"
         await self.bot.process_commands(new_msg)
 
+    @commands.command()
+    @commands.is_owner()
+    async def leave(self, ctx, *, guildinput):
+        try:
+            guildid = int(guildinput)
+        except:
+            return await ctx.send("Invalid guild: failed to convert to int")
+        try:
+            guild = self.bot.get_guild(guildid)
+        except:
+            return await ctx.send("Invalid guild")
+        try:
+            await guild.leave()
+            await ctx.send(f":ok_hand: left {guild.name}")
+        except:
+            await ctx.send("Error leaving guild")
+
 
 def setup(bot):
     bot.add_cog(Admin(bot))
