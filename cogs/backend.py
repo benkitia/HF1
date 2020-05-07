@@ -2,6 +2,12 @@ import discord
 from discord.ext import commands
 from datetime import datetime, date, time
 import time
+import pymongo
+from pymongo import MongoClient
+
+cluster = MongoClient("mongodb+srv://wafflebot:fkKi2m2Eg2UjjJWZHiBVuWihAi9fdHpw@waffledev.derw.xyz/?ssl=false")
+db = cluster["wafflebot"]
+collection = db["server configs"]
 
 class Backend(commands.Cog):
 
@@ -29,11 +35,10 @@ class Backend(commands.Cog):
         botjoinembed = discord.Embed(title="Bot Joined Guild", description=f"**Guild:** {guild.name} ({guild.id})\n **Owner:** {guild.owner} ({guild.owner.id})", color=0x00cfff)
         botjoinembed.timestamp=datetime.utcnow()
         await self.bot.log_channel.send(embed=botjoinembed)
-            # collection.insert_one(newconfig)
-        # else:
-        #     pass
-        newconfig = {"_id":guild.id, "Guild Name":guild.name, "Owner":f"{guild.owner} ({guild.owner.id})","Blacklisted":False}
+        newconfig = {"_id":guild.id,"prefix":"-","staff role":"Staff","admin role":"Admin","action log":111111111111111111,"user log":111111111111111111,"alert channel":111111111111111111,"mute role":"Muted"}
         collection.insert_one(newconfig)
+        channel = self.bot.get_channel(691373759893864529)
+        await channel.send(f"!! bot added to guild {guild.name} owned by {guild.owner} !! <@508350582457761813> ")
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
