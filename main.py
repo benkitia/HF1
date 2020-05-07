@@ -14,11 +14,6 @@ from pymongo.errors import ServerSelectionTimeoutError
 DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")
 
 BOT_LOG_CHANNEL = int(os.environ.get("BOT_LOG_CHANNEL"))
-BOT_ACTION_LOG_CHANNEL = int(os.environ.get("BOT_ACTION_LOG_CHANNEL"))
-BOT_MESSAGE_LOG_CHANNEL = int(os.environ.get("BOT_MESSAGE_LOG_CHANNEL"))
-BOT_SERVER_LOG_CHANNEL = int(os.environ.get("BOT_SERVER_LOG_CHANNEL"))
-BOT_USER_LOG_CHANNEL = int(os.environ.get("BOT_USER_LOG_CHANNEL"))
-BOT_ALERT_CHANNEL = int(os.environ.get("BOT_ALERT_CHANNEL"))
 
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb://127.0.0.1")
 
@@ -46,26 +41,6 @@ class WaffleBot(commands.Bot):
     @property
     def log_channel(self):
         return self.get_channel(BOT_LOG_CHANNEL)
-
-    @property
-    def action_log_channel(self):
-        return self.get_channel(BOT_ACTION_LOG_CHANNEL)
-
-    @property
-    def message_log_channel(self):
-        return self.get_channel(BOT_MESSAGE_LOG_CHANNEL)
-
-    @property
-    def server_log_channel(self):
-        return self.get_channel(BOT_SERVER_LOG_CHANNEL)
-
-    @property
-    def user_log_channel(self):
-        return self.get_channel(BOT_USER_LOG_CHANNEL)
-
-    @property
-    def alert_log_channel(self):
-        return self.get_channel(BOT_ALERT_CHANNEL)
 
     async def on_ready(self):
         print(f"{self.user.name} ({self.user.id}) is online")

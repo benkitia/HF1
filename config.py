@@ -1,8 +1,5 @@
 import os
 
-BOT_GUILD_ID = int(os.environ.get("BOT_GUILD_ID"))
-BOT_MUTE_ROLE = int(os.environ.get("BOT_MUTE_ROLE"))
-
 class Config:
     tester = [
             477556772220043278, # Avocado#5614
@@ -19,5 +16,3 @@ class Config:
             297567836254240768, # Moo#8008
             167726726451953664  # derw#0387
         ]
-    guild_id = BOT_GUILD_ID
-    mute_role = BOT_MUTE_ROLE
