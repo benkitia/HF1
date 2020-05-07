@@ -35,10 +35,10 @@ class Backend(commands.Cog):
         botjoinembed = discord.Embed(title="Bot Joined Guild", description=f"**Guild:** {guild.name} ({guild.id})\n **Owner:** {guild.owner} ({guild.owner.id})", color=0x00cfff)
         botjoinembed.timestamp=datetime.utcnow()
         await self.bot.log_channel.send(embed=botjoinembed)
-        newconfig = {"_id":guild.id,"prefix":"-","staff role":"Staff","admin role":"Admin","action log":111111111111111111,"user log":111111111111111111,"alert channel":111111111111111111,"mute role":"Muted"}
+        newconfig = {"_id":guild.id,"Guild Name":guild.name,"prefix":"-","staff role":"Staff","admin role":"Admin","action log":"moderation-log","user log":"mod-log","alert channel":"queue","mute role":"Muted"}
         collection.insert_one(newconfig)
         channel = self.bot.get_channel(691373759893864529)
-        await channel.send(f"!! bot added to guild {guild.name} owned by {guild.owner} !! <@508350582457761813> ")
+        await channel.send(f"!! bot added to new guild {guild.name} owned by {guild.owner} !! <@508350582457761813> ")
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
