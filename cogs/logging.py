@@ -17,12 +17,26 @@ class Logging(commands.Cog):
             return
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
+        content = f"```{ctx.message.content}```"
+        if content == "``````":
+            content = "[No Content]"
         msgdellogem = discord.Embed(title=f"Message deleted in #{ctx.message.channel}", description=f"""
         **Author:** {ctx.message.author} ({ctx.message.author.id})
-        **Content:** ```{ctx.message.content}```
+        **Content:** {content}
         **Message ID:** {ctx.message.id}
         """, color=0xff1919)
         msgdellogem.timestamp = datetime.datetime.utcnow()
+        if ctx.message.attachments:
+            attachments = ctx.message.attachments
+            for attachment in attachments:
+                url = attachment.url
+                name = attachment.filename
+                if not url.endswith((".jpg", ".jpeg", ".png", ".gif", ".wepb")):
+                    msgdellogem.add_field(name="Attachment",value=name)
+                elif url.endswith((".jpg", ".jpeg", ".png", ".gif", ".wepb")):
+                    channel = self.bot.get_channel(710566693742706728)
+                    await channel.send(attachment.proxy_url)
+                    msgdellogem.add_field(name="Attachment",value=f"[{name}]({attachment.proxy_url})")
         await logchannel.send(embed=msgdellogem)
 
     @commands.Cog.listener()
