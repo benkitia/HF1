@@ -1,27 +1,22 @@
 import discord
 from discord.ext import commands
 import datetime
-import pymongo
-from pymongo import MongoClient
-
-cluster = MongoClient("mongodb+srv://wafflebot:fkKi2m2Eg2UjjJWZHiBVuWihAi9fdHpw@waffledev.derw.xyz/?ssl=false")
-db = cluster["wafflebot"]
-infractions = db["infractions"]
-guildconfig = db["server configs"]
 
 class Logging(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.db = bot.db
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         ctx: commands.Context = await self.bot.get_context(message)
-        getvars = guildconfig.find_one({"_id":ctx.message.guild.id})
-        logchannelname = getvars["user log"]
-        if logchannelname is None or message.author.bot:
+        getvars = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
+        logchannelidstr = getvars["message log"]
+        if logchannelidstr == "disabled" or message.author.bot:
             return
-        logchannel = discord.utils.get(ctx.guild.text_channels, name=logchannelname)
+        logchannelid = int(logchannelidstr)
+        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         msgdellogem = discord.Embed(title=f"Message deleted in #{ctx.message.channel}", description=f"""
         **Author:** {ctx.message.author} ({ctx.message.author.id})
         **Content:** ```{ctx.message.content}```
@@ -33,11 +28,12 @@ class Logging(commands.Cog):
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
         ctx: commands.Context = await self.bot.get_context(before)
-        getvars = guildconfig.find_one({"_id":ctx.message.guild.id})
-        logchannelname = getvars["user log"]
-        if logchannelname is None or ctx.author.bot:
+        getvars = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
+        logchannelidstr = getvars["message log"]
+        if logchannelidstr == "disabled" or before.author.bot:
             return
-        logchannel = discord.utils.get(ctx.guild.text_channels, name=logchannelname)
+        logchannelid = int(logchannelidstr)
+        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         msgeditlogem = discord.Embed(title=f"Message edited in #{ctx.message.channel}", description=f"""
         **Author:** {ctx.message.author} ({ctx.message.author.id})
         **Before:** ```{before.content}```
@@ -49,12 +45,13 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        getvars = guildconfig.find_one({"_id":member.guild.id})
-        logchannelname = getvars["user log"]
-        if logchannelname is None:
+        getvars = await self.db.guildconfigs.find_one({"_id":member.guild.id})
+        logchannelidstr = getvars["travel log"]
+        if logchannelidstr == "disabled":
             return
-        logchannel = discord.utils.get(member.guild.text_channels, name=logchannelname)
-        global_inf_count = infractions.count_documents({"Target":member.id, "Status":"Active"})
+        logchannelid = int(logchannelidstr)
+        logchannel = discord.utils.get(member.guild.text_channels, id=logchannelid)
+        global_inf_count = await self.db.infractions.count_documents({"Target":member.id, "Status":"Active"})
         memjoinem = discord.Embed(title="User Joined",description=f"""**User** {member} ({member.id})
         **Created At:** {member.created_at}
         **Global Infraction Count:** {global_inf_count}
@@ -65,12 +62,13 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        getvars = guildconfig.find_one({"_id":member.guild.id})
-        logchannelname = getvars["user log"]
-        if logchannelname is None:
+        getvars = await self.db.guildconfigs.find_one({"_id":member.guild.id})
+        logchannelidstr = getvars["travel log"]
+        if logchannelidstr == "disabled":
             return
-        logchannel = discord.utils.get(member.guild.text_channels, name=logchannelname)
-        inf_count = infractions.count_documents({"Target":member.id, "Guild":member.guild.id,"Status":"Active"})
+        logchannelid = int(logchannelidstr)
+        logchannel = discord.utils.get(member.guild.text_channels, id=logchannelid)
+        inf_count = await self.db.infractions.count_documents({"Target":member.id, "Guild":member.guild.id,"Status":"Active"})
         memleaveem = discord.Embed(title="User Left",description=f"""**User** {member} ({member.id})
         **Joined at:** {member.joined_at}
         **Infraction Count:** {inf_count}

@@ -1,35 +1,32 @@
 import discord
 from discord.ext import commands
-import pymongo
-from pymongo import MongoClient
 import random
 from datetime import datetime, date, time
 import time
-
-cluster = MongoClient("mongodb+srv://wafflebot:fkKi2m2Eg2UjjJWZHiBVuWihAi9fdHpw@waffledev.derw.xyz/?ssl=false")
-db = cluster["wafflebot"]
-infractions = db["infractions"]
-guildconfig = db["server configs"]
 
 class Moderation(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.db = bot.db
 
     @commands.command(description="Bans a user")
+    @commands.guild_only()
     async def ban(self, ctx, target:discord.User=None, *, reason=None):
-        casenumber = random.randint(1000000000, 9999999999)
-        getvars = guildconfig.find_one({"_id":ctx.message.guild.id})
-        staffrolename = getvars["staff role"]
-        staffrole = discord.utils.get(ctx.guild.roles, name=staffrolename)
-        adminrolename = getvars["admin role"]
-        adminrole = discord.utils.get(ctx.guild.roles, name=adminrolename)
+        getvars = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
+        staffroleidstr = getvars["staff role"]
+        staffroleid = int(staffroleidstr)
+        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
+        adminroleidstr = getvars["admin role"]
+        adminroleid = int(adminroleidstr)
+        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
         if staffrole not in ctx.message.author.roles:
             if adminrole not in ctx.message.author.roles:
                 missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
                 return await ctx.send(embed=missingperms)
-        logchannelname = getvars["action log"]
-        logchannel = discord.utils.get(ctx.guild.text_channels, name=logchannelname)
+        logchannelidstr = getvars["action log"]
+        logchannelid = int(logchannelidstr)
+        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         casenumber = random.randint(1000000000, 9999999999)
         banlog = discord.Embed(title=f"{target} banned", description=f"""**User:** {target} ({target.id})
         **Reason:** {reason}
@@ -52,23 +49,27 @@ class Moderation(commands.Cog):
                 await logchannel.send(embed=banlog)
             except discord.Forbidden:
                 await ctx.send("<:error:696628928458129488> I can't log this action because I can't speak in the log channel")
-        post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Ban","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"Active","Guild":ctx.message.guild.id}
-        infractions.insert_one(post)
+        post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Ban","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"active","Guild":ctx.message.guild.id}
+        await self.db.infractions.insert_one(post)
 
     @commands.command(description="Removes a user's ban")
+    @commands.guild_only()
     async def unban(self, ctx, id:int=None, *, reason=None):
         target = await self.bot.fetch_user(id)
-        getvars = guildconfig.find_one({"_id":ctx.message.guild.id})
-        staffrolename = getvars["staff role"]
-        staffrole = discord.utils.get(ctx.guild.roles, name=staffrolename)
-        adminrolename = getvars["admin role"]
-        adminrole = discord.utils.get(ctx.guild.roles, name=adminrolename)
+        getvars = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
+        staffroleidstr = getvars["staff role"]
+        staffroleid = int(staffroleidstr)
+        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
+        adminroleidstr = getvars["admin role"]
+        adminroleid = int(adminroleidstr)
+        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
         if staffrole not in ctx.message.author.roles:
             if adminrole not in ctx.message.author.roles:
                 missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
                 return await ctx.send(embed=missingperms)
-        logchannelname = getvars["action log"]
-        logchannel = discord.utils.get(ctx.guild.text_channels, name=logchannelname)
+        logchannelidstr = getvars["action log"]
+        logchannelid = int(logchannelidstr)
+        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         unbanlog = discord.Embed(title=f"{target} unbanned", description=f"""**User:** {target} ({id})
         **Reason:** {reason}
         **Responsible Moderator:** {ctx.message.author}
@@ -91,18 +92,22 @@ class Moderation(commands.Cog):
                 await ctx.send("<:error:696628928458129488> I can't log this action because I can't speak in the log channel")
 
     @commands.command(description="Kicks a user")
+    @commands.guild_only()
     async def kick(self, ctx, target:discord.User=None, *, reason=None):
-        getvars = guildconfig.find_one({"_id":ctx.message.guild.id})
-        staffrolename = getvars["staff role"]
-        staffrole = discord.utils.get(ctx.guild.roles, name=staffrolename)
-        adminrolename = getvars["admin role"]
-        adminrole = discord.utils.get(ctx.guild.roles, name=adminrolename)
+        getvars = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
+        staffroleidstr = getvars["staff role"]
+        staffroleid = int(staffroleidstr)
+        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
+        adminroleidstr = getvars["admin role"]
+        adminroleid = int(adminroleidstr)
+        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
         if staffrole not in ctx.message.author.roles:
             if adminrole not in ctx.message.author.roles:
                 missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
                 return await ctx.send(embed=missingperms)
-        logchannelname = getvars["action log"]
-        logchannel = discord.utils.get(ctx.guild.text_channels, name=logchannelname)
+        logchannelidstr = getvars["action log"]
+        logchannelid = int(logchannelidstr)
+        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         casenumber = random.randint(1000000000, 9999999999)
         kicklog = discord.Embed(title=f"{target} kicked", description=f"""**User:** {target} ({target.id})
         **Reason:** {reason}
@@ -127,23 +132,28 @@ class Moderation(commands.Cog):
                 await ctx.send("<:error:696628928458129488> I can't log this action because I can't speak in the log channel")
         casenumber = random.randint(1000000000, 9999999999)
         post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Kick","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"Active","Guild":ctx.message.guild.id}
-        infractions.insert_one(post)
+        await self.db.infractions.insert_one(post)
 
     @commands.command(description="Mutes a user")
+    @commands.guild_only()
     async def mute(self, ctx, target:discord.Member=None, *, reason=None):
-        getvars = guildconfig.find_one({"_id":ctx.message.guild.id})
-        staffrolename = getvars["staff role"]
-        staffrole = discord.utils.get(ctx.guild.roles, name=staffrolename)
-        adminrolename = getvars["admin role"]
-        adminrole = discord.utils.get(ctx.guild.roles, name=adminrolename)
+        getvars = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
+        staffroleidstr = getvars["staff role"]
+        staffroleid = int(staffroleidstr)
+        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
+        adminroleidstr = getvars["admin role"]
+        adminroleid = int(adminroleidstr)
+        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
         if staffrole not in ctx.message.author.roles:
             if adminrole not in ctx.message.author.roles:
                 missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
                 return await ctx.send(embed=missingperms)
-        muterolename = getvars["mute role"]
-        muterole = discord.utils.get(ctx.guild.roles, name=muterolename)
-        logchannelname = getvars["action log"]
-        logchannel = discord.utils.get(ctx.guild.text_channels, name=logchannelname)
+        logchannelidstr = getvars["action log"]
+        logchannelid = int(logchannelidstr)
+        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
+        muteroleidstr = getvars["mute role"]
+        muteroleid = int(muteroleidstr)
+        muterole = discord.utils.get(ctx.guild.roles, id=muteroleid)
         casenumber = random.randint(1000000000, 9999999999)
         mutelog = discord.Embed(title=f"{target} muted", description=f"""**User:** {target} ({target.id})
         **Reason:** {reason}
@@ -170,23 +180,28 @@ class Moderation(commands.Cog):
             except discord.Forbidden:
                 await ctx.send("<:error:696628928458129488> I couldn't log this action because I can't send messages in the log channel")
         post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Mute","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"Active","Guild":ctx.message.guild.id}
-        infractions.insert_one(post)
+        await self.db.infractions.insert_one(post)
 
     @commands.command(description="Removes a user's mute")
+    @commands.guild_only()
     async def unmute(self, ctx, target:discord.Member=None, *, reason=None):
-        getvars = guildconfig.find_one({"_id":ctx.message.guild.id})
-        staffrolename = getvars["staff role"]
-        staffrole = discord.utils.get(ctx.guild.roles, name=staffrolename)
-        adminrolename = getvars["admin role"]
-        adminrole = discord.utils.get(ctx.guild.roles, name=adminrolename)
+        getvars = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
+        staffroleidstr = getvars["staff role"]
+        staffroleid = int(staffroleidstr)
+        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
+        adminroleidstr = getvars["admin role"]
+        adminroleid = int(adminroleidstr)
+        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
         if staffrole not in ctx.message.author.roles:
             if adminrole not in ctx.message.author.roles:
                 missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
                 return await ctx.send(embed=missingperms)
-        muterolename = getvars["mute role"]
-        muterole = discord.utils.get(ctx.guild.roles, name=muterolename)
-        logchannelname = getvars["action log"]
-        logchannel = discord.utils.get(ctx.guild.text_channels, name=logchannelname)
+        logchannelidstr = getvars["action log"]
+        logchannelid = int(logchannelidstr)
+        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
+        muteroleidstr = getvars["mute role"]
+        muteroleid = int(muteroleidstr)
+        muterole = discord.utils.get(ctx.guild.roles, id=muteroleid)
         unmutelog = discord.Embed(title=f"{target} unmuted", description=f"""**User:** {target} ({target.id})
         **Reason:** {reason}
         **Responsible Moderator:** {ctx.message.author}
@@ -212,18 +227,22 @@ class Moderation(commands.Cog):
                 await ctx.send("<:error:696628928458129488> I couldn't log this action because I can't send messages in the log channel")
 
     @commands.command(description="Issues a user a warning")
+    @commands.guild_only()
     async def warn(self, ctx, target:discord.Member=None, *, reason=None):
-        getvars = guildconfig.find_one({"_id":ctx.message.guild.id})
-        staffrolename = getvars["staff role"]
-        staffrole = discord.utils.get(ctx.guild.roles, name=staffrolename)
-        adminrolename = getvars["admin role"]
-        adminrole = discord.utils.get(ctx.guild.roles, name=adminrolename)
+        getvars = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
+        staffroleidstr = getvars["staff role"]
+        staffroleid = int(staffroleidstr)
+        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
+        adminroleidstr = getvars["admin role"]
+        adminroleid = int(adminroleidstr)
+        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
         if staffrole not in ctx.message.author.roles:
             if adminrole not in ctx.message.author.roles:
                 missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
                 return await ctx.send(embed=missingperms)
-        logchannelname = getvars["action log"]
-        logchannel = discord.utils.get(ctx.guild.text_channels, name=logchannelname)
+        logchannelidstr = getvars["action log"]
+        logchannelid = int(logchannelidstr)
+        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         casenumber = random.randint(1000000000, 9999999999)
         warnlog = discord.Embed(title=f"{target} warned", description=f"""**User:** {target} ({target.id})
         **Reason:** {reason}
@@ -236,7 +255,7 @@ class Moderation(commands.Cog):
            return await ctx.send("<:error:696628928458129488> You cannot warn yourself")
         else:
             post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Warning","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"Active","Guild":ctx.message.guild.id}
-            infractions.insert_one(post)
+            await self.db.infractions.insert_one(post)
             try:
                 await target.send(f":warning: You've been warned for **{reason}** in **{ctx.message.guild}**")
                 await ctx.send(f":ok_hand: Warned **{target}** for *{reason}*")
