@@ -2,17 +2,12 @@ import discord
 from discord.ext import commands
 from datetime import datetime, date, time
 import time
-import pymongo
-from pymongo import MongoClient
-
-cluster = MongoClient("mongodb+srv://wafflebot:fkKi2m2Eg2UjjJWZHiBVuWihAi9fdHpw@waffledev.derw.xyz/?ssl=false")
-db = cluster["wafflebot"]
-collection = db["infractions"]
 
 class Basic(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.db = bot.db
 
     @commands.command(description="Returns bot response time")
     async def ping(self, ctx):
@@ -57,9 +52,14 @@ class Basic(commands.Cog):
             return await ctx.send("<:error:696628928458129488> Invalid format. Valid formats include ‘webp’, ‘jpeg’, ‘jpg’, ‘png’ or ‘gif’ (for animated avatars)")
 
     @commands.command(description="Returns information about a server")
-    async def serverinfo(self, ctx):
+    async def serverinfo(self, ctx, guildid=None):
+        if guildid==None:
+            guildid = ctx.message.guild.id
+        guildid = int(guildid)
+        guild = self.bot.get_guild(guildid)
         guild = ctx.guild
-        server_inf_count = collection.count_documents({"Guild":guild.id})
+        guild = self.bot.get_guild(guildid)
+        server_inf_count = await self.db.infractions.count_documents({"Guild":guild.id})
         findbots = sum(1 for member in ctx.guild.members if member.bot)
         iconurl = guild.icon_url_as(format='png')
         serverinfoem=discord.Embed(title=guild.name, color=0xFED870)

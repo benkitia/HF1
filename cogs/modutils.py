@@ -1,23 +1,18 @@
 import discord
 from discord.ext import commands
-import pymongo
-from pymongo import MongoClient
-
-cluster = MongoClient("mongodb+srv://wafflebot:fkKi2m2Eg2UjjJWZHiBVuWihAi9fdHpw@waffledev.derw.xyz/?ssl=false")
-db = cluster["wafflebot"]
-collection = db["infractions"]
 
 class Modutils(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.db = bot.db
 
     @commands.command(description="Returns information about a user", aliases=['profile','info'])
     async def userinfo(self, ctx, user:discord.Member=None):
         if user==None:
             user = ctx.message.author
-        inf_count = collection.count_documents({"Target":user.id, "Guild":ctx.message.guild.id,"Status":"Active"})
-        global_inf_count = collection.count_documents({"Target":user.id, "Status":"Active"})
+        inf_count = await self.db.infractions.count_documents({"Target":user.id, "Guild":ctx.message.guild.id,"Status":"Active"})
+        global_inf_count = await self.db.infractions.count_documents({"Target":user.id, "Status":"Active"})
         userinfoem = discord.Embed(title=f"{user}", colour=user.color)
         userinfoem.add_field(name = "Name: ", value = user.name, inline = True)
         userinfoem.add_field(name = "ID: ", value = user.id, inline = True)
@@ -46,8 +41,9 @@ class Modutils(commands.Cog):
         except:
             return await ctx.send("<:error:696628928458129488> Invalid case number: not a number")
         if len(casenumber) != 10:
-            return await ctx.send("<:error:696628928458129488> Invalid case number: not 10 digits")
-        result = collection.find_one({"Case Number":case})
+            if len(casenumber) != 15:
+                return await ctx.send("<:error:696628928458129488> Invalid case number: not 10 or 15 digits")
+        result = await self.db.infractions.find_one({"Case Number":case})
         targetid = result["Target"]
         punishtype = result["Punishment Type"]
         target = result["Target Name"]
@@ -69,11 +65,11 @@ class Modutils(commands.Cog):
 
     @commands.command(description="Pulls user's active infractions",aliases=['infractions'])
     @commands.has_permissions(kick_members=True)
-    async def search(self, ctx, target:discord.Member):
-        results=collection.find({"Target":target.id, "Guild":ctx.message.guild.id,"Status":"Active"})
-        inf_count = collection.count_documents({"Target":target.id, "Guild":ctx.message.guild.id,"Status":"Active"})
+    async def search(self, ctx, target:discord.User):
+        results = self.db.infractions.find({"Target":target.id, "Guild":ctx.message.guild.id,"Status":"Active"})
+        inf_count = await self.db.infractions.count_documents({"Target":target.id, "Guild":ctx.message.guild.id,"Status":"Active"})
         searchem = discord.Embed(title=f"{target}'s Infractions",description=f'{inf_count} infractions',color=0xffc0aa)
-        for result in results:
+        async for result in results:
                 case = result["Case Number"]
                 punishtype = result["Punishment Type"]
                 reason = result["Reason"]
@@ -84,10 +80,10 @@ class Modutils(commands.Cog):
 
     @commands.command(description="Pulls user's active infractions",aliases=['allinfractions'])
     @commands.has_permissions(kick_members=True)
-    async def searchall(self, ctx, target:discord.Member):
-        results=collection.find({"Target":target.id, "Guild":ctx.message.guild.id})
+    async def searchall(self, ctx, target:discord.User):
+        results = self.db.infractions.find({"Target":target.id, "Guild":ctx.message.guild.id})
         searchem = discord.Embed(title=f"{target}'s Infractions", description='*This list includes deleted infractions, use search command to search for active infractions*',color=0xffc0aa)
-        for result in results:
+        async for result in results:
                 case = result["Case Number"]
                 punishtype = result["Punishment Type"]
                 reason = result["Reason"]
@@ -106,7 +102,7 @@ class Modutils(commands.Cog):
         if len(casenumber) != 10:
             return await ctx.send("<:error:696628928458129488> Invalid case number: not 10 digits")
         try:
-            collection.update_one({"Case Number":case},{"$set":{"Status":"Inactive"}})
+            await self.db.infractions.update_one({"Case Number":case},{"$set":{"Status":"Inactive"}})
         except:
             return await ctx.send("<:error:696628928458129488> Error deleting infraction")
         await ctx.send(f":ok_hand: Deleted infraction {casenumber}")

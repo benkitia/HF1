@@ -13,32 +13,29 @@ class Backend(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.db = bot.db
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.CommandNotFound):
+            return
+        if isinstance(error, commands.MissingPermissions):
+            return await ctx.send("<:error:696628928458129488> You do not have permission to run this command")
+        if isinstance(error, commands.UserInputError):
+            return await ctx.send("<:error:696628928458129488> Invalid arguement(s)")
+        elif isinstance(error, commands.errors.NotOwner):
+            return await ctx.send("<:error:696628928458129488> You do not have permission to run this command")
         errorembed = discord.Embed(title="Command Error",description=f"**Error:** ```{error}```\n**Server:** {ctx.message.guild} ({ctx.message.guild.id})\n**Channel:** <#{ctx.message.channel.id}>- {ctx.message.channel} ({ctx.message.channel.id})\n**User:** {ctx.message.author} ({ctx.message.author.id})", color=0xff0000)
         errorembed.timestamp=datetime.utcnow()
         await self.bot.log_channel.send(embed=errorembed)
-        if isinstance(error, commands.MissingPermissions):
-            missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
-            await ctx.send(embed=missingperms)
-            return
-        if isinstance(error, commands.UserInputError):
-            badinput = discord.Embed(title="Invalid syntax/input", description=f"Use the help command to find proper syntax",color=0xff0000)
-            await ctx.send(embed=badinput)
-            return
-        miscerror = discord.Embed(title="Error", description=error)
-        await ctx.send(embed=miscerror)
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
         botjoinembed = discord.Embed(title="Bot Joined Guild", description=f"**Guild:** {guild.name} ({guild.id})\n **Owner:** {guild.owner} ({guild.owner.id})", color=0x00cfff)
         botjoinembed.timestamp=datetime.utcnow()
         await self.bot.log_channel.send(embed=botjoinembed)
-        newconfig = {"_id":guild.id,"Guild Name":guild.name,"prefix":"-","staff role":"Staff","admin role":"Admin","action log":"moderation-log","user log":"mod-log","alert channel":"queue","mute role":"Muted"}
-        collection.insert_one(newconfig)
-        channel = self.bot.get_channel(691373759893864529)
-        await channel.send(f"!! bot added to new guild {guild.name} owned by {guild.owner} !! <@508350582457761813> ")
+        newconfig = {"_id":guild.id,"Guild Name":guild.name,"prefix":"-","staff role":"placeholder","admin role":"placeholder","action log":"placeholder","user log":"placeholder","alert channel":"placeholder","mute role":"placeholder","filter invites":False,"filter bad words":False}
+        self.db.guildconfigs.insert_one(newconfig)
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
