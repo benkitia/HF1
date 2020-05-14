@@ -25,22 +25,24 @@ class Basic(commands.Cog):
     @commands.command(description="Returns bot information")
     async def botinfo(self, ctx):
         botinfoem = discord.Embed(title="Bot Information",description=f"""
-        {self.bot.user.name} is based on Wafflebot, a moderation and utility bot by Waffle Development written in [discord.py](https://github.com/Rapptz/discord.py)
+        Wafflebot is a private moderation and utility bot by Waffle Development written in [discord.py](https://github.com/Rapptz/discord.py).
+
+        Wafflebot is currently in the alpha stage. If you'd like to add it to your server, join the support server.
 
         For general support with commands and bot functions join the Waffle Development Discord server: https://discord.gg/zrBqN2v
 
         For support with the bot's configuration or to report any bugs or add the bot to your own server join the server above or email support@waffledev.xyz
         """, color=0x5c92ff)
-        botinfoem.add_field(name = "Docs:", value = "https://waffledev.xyz/wafflebot", inline = False)
+        botinfoem.add_field(name = "Docs:", value = "Coming soon", inline = False)
         botinfoem.add_field(name = "Support server:", value = "https://discord.gg/zrBqN2v", inline = False)
         botinfoem.add_field(name = "Config support and inquiry email:", value = "support@waffledev.xyz", inline = False)
         botinfoem.add_field(name = "Credits:", value = """
         waffles#4918 - Main code
-        derw#0387 - Database and infractions
-        Moo#8008 - Database and infractions
-        Blue#9588 - Support with development
+        derw#0387 - Help with development
         https://codeclimate.com/github/tekulvw/Squid-Plugins/admin/admin.py/source
         https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py#L137
+        https://github.com/AEnterprise/GearBoat
+        https://github.com/notderw/penelope
         """, inline = False)
         await ctx.send(embed=botinfoem)
 
