@@ -17,15 +17,12 @@ class Logging(commands.Cog):
             return
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
-        content = f"```{ctx.message.content}```"
-        if content == "``````":
+        content = ctx.message.content
+        if not content:
             content = "[No Content]"
-        msgdellogem = discord.Embed(title=f"Message deleted in #{ctx.message.channel}", description=f"""
-        **Author:** {ctx.message.author} ({ctx.message.author.id})
-        **Content:** {content}
-        **Message ID:** {ctx.message.id}
-        """, color=0xff1919)
+        msgdellogem = discord.Embed(description=f"Message {ctx.message.id} deleted from <#{ctx.message.channel.id}>:\n**Content:** {content}", color=0xff1919)
         msgdellogem.timestamp = datetime.datetime.utcnow()
+        msgdellogem.set_author(icon_url=ctx.message.author.avatar_url, name=f"{ctx.message.author} ({ctx.message.author.id})")
         if ctx.message.attachments:
             attachments = ctx.message.attachments
             for attachment in attachments:
@@ -48,12 +45,14 @@ class Logging(commands.Cog):
             return
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
-        msgeditlogem = discord.Embed(title=f"Message edited in #{ctx.message.channel}", description=f"""
-        **Author:** {ctx.message.author} ({ctx.message.author.id})
-        **Before:** ```{before.content}```
-        **After:** ```{after.content}```
-        **Message ID:** {ctx.message.id}
-        """, color=0xff8500)
+        before_content = before.content
+        if not before_content:
+            before_content = "[No Content]"
+        after_content = after.content
+        if not after_content:
+            after_content = "[No Content]"
+        msgeditlogem = discord.Embed(description=f"Message {ctx.message.id} edited in <#{ctx.message.channel.id}>:\n**Before:** {before_content}\n**After:** {after_content}", color=0xff8500)
+        msgeditlogem.set_author(icon_url=ctx.message.author.avatar_url, name=f"{ctx.message.author} ({ctx.message.author.id})")
         msgeditlogem.timestamp = datetime.datetime.utcnow()
         await logchannel.send(embed=msgeditlogem)
 
@@ -66,12 +65,10 @@ class Logging(commands.Cog):
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(member.guild.text_channels, id=logchannelid)
         global_inf_count = await self.db.infractions.count_documents({"Target":member.id, "Status":"Active"})
-        memjoinem = discord.Embed(title="User Joined",description=f"""**User** {member} ({member.id})
-        **Created At:** {member.created_at}
-        **Global Infraction Count:** {global_inf_count}
-        """, color=0x48ff99)
+        memjoinem = discord.Embed(description=f"{member.name} has joined the server\nThey have {global_inf_count} global infraction(s)\nThere are now {member.guild.member_count} members",color=0x48ff99)
         memjoinem.set_thumbnail(url=member.avatar_url)
         memjoinem.timestamp = datetime.datetime.utcnow()
+        memjoinem.set_author(icon_url=member.avatar_url, name=f"{member} ({member.id})")
         await logchannel.send(embed=memjoinem)
 
     @commands.Cog.listener()
@@ -83,13 +80,26 @@ class Logging(commands.Cog):
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(member.guild.text_channels, id=logchannelid)
         inf_count = await self.db.infractions.count_documents({"Target":member.id, "Guild":member.guild.id,"Status":"Active"})
-        memleaveem = discord.Embed(title="User Left",description=f"""**User** {member} ({member.id})
-        **Joined at:** {member.joined_at}
-        **Infraction Count:** {inf_count}
-        """, color=0xff7d7d)
+        memleaveem = discord.Embed(description=f"{member.name} has left the server\nThey had {inf_count} infraction(s)\nThere are now {member.guild.member_count} members",color=0xff7d7d)
         memleaveem.set_thumbnail(url=member.avatar_url)
         memleaveem.timestamp = datetime.datetime.utcnow()
+        memleaveem.set_author(icon_url=member.avatar_url, name=f"{member} ({member.id})")
         await logchannel.send(embed=memleaveem)
+
+    @commands.Cog.listener()
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        if before.nick == after.nick:
+            return
+        getvars = await self.db.guildconfigs.find_one({"_id":before.guild.id})
+        logchannelidstr = getvars["user log"]
+        if logchannelidstr == "disabled":
+            return
+        logchannelid = int(logchannelidstr)
+        logchannel = discord.utils.get(before.guild.text_channels, id=logchannelid)
+        nickem = discord.Embed(description=f"Nickname changed\n**Before:** {before.nick}\n**After:** {after.nick}",color=0xeb88ff)
+        nickem.set_author(icon_url=before.avatar_url, name=f"{before} ({before.id})")
+        nickem.timestamp = datetime.datetime.utcnow()
+        await logchannel.send(embed=nickem)
 
 def setup(bot):
     bot.add_cog(Logging(bot))

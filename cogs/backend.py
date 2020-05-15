@@ -2,12 +2,6 @@ import discord
 from discord.ext import commands
 from datetime import datetime, date, time
 import time
-import pymongo
-from pymongo import MongoClient
-
-cluster = MongoClient("mongodb+srv://wafflebot:fkKi2m2Eg2UjjJWZHiBVuWihAi9fdHpw@waffledev.derw.xyz/?ssl=false")
-db = cluster["wafflebot"]
-collection = db["server configs"]
 
 class Backend(commands.Cog):
 
@@ -34,7 +28,7 @@ class Backend(commands.Cog):
         botjoinembed = discord.Embed(title="Bot Joined Guild", description=f"**Guild:** {guild.name} ({guild.id})\n **Owner:** {guild.owner} ({guild.owner.id})", color=0x00cfff)
         botjoinembed.timestamp=datetime.utcnow()
         await self.bot.log_channel.send(embed=botjoinembed)
-        newconfig = {"_id":guild.id,"Guild Name":guild.name,"prefix":"-","staff role":"placeholder","admin role":"placeholder","action log":"placeholder","user log":"placeholder","alert channel":"placeholder","mute role":"placeholder","filter invites":False,"filter bad words":False}
+        newconfig = {"_id":guild.id,"Guild Name":guild.name,"prefix":"-","staff role":"placeholder","admin role":"placeholder","action log":"disabled","message log":"disabled","travel log":"disabled","user log":"disabled","alert channel":"disabled","mute role":"placeholder","filter invites":False,"filter bad words":False}
         self.db.guildconfigs.insert_one(newconfig)
 
     @commands.Cog.listener()
