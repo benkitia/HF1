@@ -31,8 +31,13 @@ class Logging(commands.Cog):
                 if not url.endswith((".jpg", ".jpeg", ".png", ".gif", ".wepb")):
                     msgdellogem.add_field(name="Attachment",value=name)
                 elif url.endswith((".jpg", ".jpeg", ".png", ".gif", ".wepb")):
-                    channel = self.bot.get_channel(710566693742706728)
-                    await channel.send(attachment.proxy_url)
+                    cachechannelstr = getvars["imagecache"]
+                    if cachechannelstr == "disabled":
+                        cachechannel = self.bot.get_channel(710566693742706728)
+                    if cachechannelstr != "disabled":
+                        cachechannelid = int(cachechannelstr)
+                        cachechannel = discord.utils.get(ctx.guild.text_channels, id=cachechannelid)
+                    await cachechannel.send(attachment.proxy_url)
                     msgdellogem.add_field(name="Attachment",value=f"[{name}]({attachment.proxy_url})")
         await logchannel.send(embed=msgdellogem)
 
