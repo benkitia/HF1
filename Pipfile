@@ -11,6 +11,8 @@ discord-py = "*"
 motor = "*"
 dnspython = "*"
 aiohttp = "*"
+openpyxl = "*"
+asyncio = "*"
 
 [requires]
 python_version = "3.8"

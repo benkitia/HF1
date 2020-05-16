@@ -56,6 +56,10 @@ class Logging(commands.Cog):
         after_content = after.content
         if not after_content:
             after_content = "[No Content]"
+        if before == after:
+            return
+        if before_content == after_content:
+            return
         msgeditlogem = discord.Embed(description=f"Message {ctx.message.id} edited in <#{ctx.message.channel.id}>:\n**Before:** {before_content}\n**After:** {after_content}", color=0xff8500)
         msgeditlogem.set_author(icon_url=ctx.message.author.avatar_url, name=f"{ctx.message.author} ({ctx.message.author.id})")
         msgeditlogem.timestamp = datetime.datetime.utcnow()
