@@ -33,7 +33,7 @@ class Modutils(commands.Cog):
             return await ctx.send("<:error:696628928458129488> You can only purge up to 300 messages at a time")
         await ctx.channel.purge(limit=amount+1)
 
-    @commands.command(description="Pulls information about an infraction")
+    @commands.command(description="Pulls information about an infraction",aliases=['inf','infraction'])
     @commands.has_permissions(kick_members=True)
     async def punishinfo(self, ctx, casenumber):
         try:
