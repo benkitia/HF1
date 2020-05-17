@@ -17,7 +17,7 @@ class Basic(commands.Cog):
         t2 = time.perf_counter()
         await ctx.send(":ping_pong: Pong! It took {}ms".format(round((t2-t1)*1000)))
 
-    @commands.command(description="Returns bot information")
+    @commands.command(description="Returns bot information",aliases=['invite','support'])
     async def botinfo(self, ctx):
         botinfoem = discord.Embed(title="Bot Information",description=f"""
         Wafflebot is a private moderation and utility bot by Waffle Development written in [discord.py](https://github.com/Rapptz/discord.py).
@@ -41,7 +41,7 @@ class Basic(commands.Cog):
         """, inline = False)
         await ctx.send(embed=botinfoem)
 
-    @commands.command(description="Returns a user's avatar in one of many formats")
+    @commands.command(description="Returns a user's avatar in one of many formats",aliases=['avi'])
     async def avatar(self, ctx, user:discord.Member=None, avi_format='png'):
         if user==None:
             user = ctx.message.author
@@ -51,7 +51,7 @@ class Basic(commands.Cog):
         except:
             return await ctx.send("<:error:696628928458129488> Invalid format. Valid formats include ‘webp’, ‘jpeg’, ‘jpg’, ‘png’ or ‘gif’ (for animated avatars)")
 
-    @commands.command(description="Returns information about a server")
+    @commands.command(description="Returns information about a server",aliases=['server'])
     async def serverinfo(self, ctx, guildid=None):
         if guildid==None:
             guildid = ctx.message.guild.id
@@ -75,6 +75,13 @@ class Basic(commands.Cog):
         serverinfoem.set_footer(text=f"Requested by {ctx.message.author}")
         serverinfoem.set_thumbnail(url=iconurl)
         await ctx.send(embed=serverinfoem)
+
+    @commands.command(description="Returns some bot statistics")
+    async def stats(self, ctx):
+        embed=discord.Embed(title="Bot Statistics")
+        embed.add_field(name="Guild Count",value=len(list(self.bot.guilds)))
+        embed.add_field(name="Total Members",value=len(set(self.bot.get_all_members())))
+        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Basic(bot))
