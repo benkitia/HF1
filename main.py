@@ -17,7 +17,7 @@ BOT_LOG_CHANNEL = int(os.environ.get("BOT_LOG_CHANNEL"))
 
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb://127.0.0.1")
 
-cogs = ['cogs.admin','cause.basic','cogs.logging','cogs.moderation','cogs.modutils']
+cogs = ['cogs.admin']
 
 # a very breif description of the bot
 description = """
