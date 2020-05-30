@@ -53,8 +53,21 @@ class Moderation(commands.Cog):
         await self.db.infractions.insert_one(post)
         dm = getvars["dm_on_ban"]
         if dm == "true":
+            dmem = discord.Embed(
+                title = ":boot: Punishent Notification: Ban",
+                description = f"""
+                **Reason:** {reason}
+                **Case ID:** {casenumber}
+                """,
+                color = 0xff1919
+            )
+            dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
+            dmem.set_author(
+                name = ctx.message.guild,
+                icon_url = ctx.message.guild.icon_url
+            )
             try:
-                await target.send(f":hammer: You've been banned for **{reason}** in **{ctx.message.guild}**")
+                await target.send(embed=dmem)
             except:
                 return
         if dm == "false":
@@ -143,8 +156,21 @@ class Moderation(commands.Cog):
         await self.db.infractions.insert_one(post)
         dm = getvars["dm_on_kick"]
         if dm == "true":
+            dmem = discord.Embed(
+                title = ":boot: Punishent Notification: Kick",
+                description = f"""
+                **Reason:** {reason}
+                **Case ID:** {casenumber}
+                """,
+                color = 0xff8500
+            )
+            dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
+            dmem.set_author(
+                name = ctx.message.guild,
+                icon_url = ctx.message.guild.icon_url
+            )
             try:
-                await target.send(f":boot: You've been kicked for **{reason}** in **{ctx.message.guild}**")
+                await target.send(embed=dmem)
             except:
                 return
         if dm == "false":
@@ -199,8 +225,21 @@ class Moderation(commands.Cog):
         await self.db.infractions.insert_one(post)
         dm = getvars["dm_on_mute"]
         if dm == "true":
+            dmem = discord.Embed(
+                title = ":mute: Punishent Notification: Mute",
+                description = f"""
+                **Reason:** {reason}
+                **Case ID:** {casenumber}
+                """,
+                color = 0xff8500
+            )
+            dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
+            dmem.set_author(
+                name = ctx.message.guild,
+                icon_url = ctx.message.guild.icon_url
+            )
             try:
-                await target.send(f":mute: You've been muted for **{reason}** in **{ctx.message.guild}**")
+                await target.send(embed=dmem)
             except:
                 return
         if dm == "false":
@@ -282,9 +321,22 @@ class Moderation(commands.Cog):
             await self.db.infractions.insert_one(post)
             dm = getvars["dm_on_warn"]
             if dm == "true":
+                dmem = discord.Embed(
+                    title = ":warning: Punishent Notification: Warning",
+                    description = f"""
+                    **Reason:** {reason}
+                    **Case ID:** {casenumber}
+                    """,
+                    color = 0xfff25f
+                )
+                dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
+                dmem.set_author(
+                    name = ctx.message.guild,
+                    icon_url = ctx.message.guild.icon_url
+                )
                 try:
-                    await target.send(f":warning: You've been warned for **{reason}** in **{ctx.message.guild}**")
-                    await ctx.send(f":ok_hand: Warned **{target}** for *{reason}*")
+                    await target.send(embed=dmem)
+                    await ctx.send(f":ok_hand: Warned {target} for **{reason}**")
                 except:
                     await ctx.send(f":ok_hand: A warning has been added to **{target}** for *{reason}\n(I couldn't DM them to notify them of their warning)*")
             if dm == "false":
