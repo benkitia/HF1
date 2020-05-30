@@ -51,6 +51,14 @@ class Moderation(commands.Cog):
                 await ctx.send("<:error:696628928458129488> I can't log this action because I can't speak in the log channel")
         post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Ban","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"active","Guild":ctx.message.guild.id}
         await self.db.infractions.insert_one(post)
+        dm = getvars["dm_on_ban"]
+        if dm == "true":
+            try:
+                await target.send(f":hammer: You've been banned for **{reason}** in **{ctx.message.guild}**")
+            except:
+                return
+        if dm == "false":
+            return
 
     @commands.command(description="Removes a user's ban")
     @commands.guild_only()
@@ -133,6 +141,14 @@ class Moderation(commands.Cog):
         casenumber = random.randint(1000000000, 9999999999)
         post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Kick","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"Active","Guild":ctx.message.guild.id}
         await self.db.infractions.insert_one(post)
+        dm = getvars["dm_on_kick"]
+        if dm == "true":
+            try:
+                await target.send(f":boot: You've been kicked for **{reason}** in **{ctx.message.guild}**")
+            except:
+                return
+        if dm == "false":
+            return
 
     @commands.command(description="Mutes a user")
     @commands.guild_only()
@@ -181,6 +197,14 @@ class Moderation(commands.Cog):
                 await ctx.send("<:error:696628928458129488> I couldn't log this action because I can't send messages in the log channel")
         post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Mute","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"Active","Guild":ctx.message.guild.id}
         await self.db.infractions.insert_one(post)
+        dm = getvars["dm_on_mute"]
+        if dm == "true":
+            try:
+                await target.send(f":mute: You've been muted for **{reason}** in **{ctx.message.guild}**")
+            except:
+                return
+        if dm == "false":
+            return
 
     @commands.command(description="Removes a user's mute")
     @commands.guild_only()
@@ -256,11 +280,15 @@ class Moderation(commands.Cog):
         else:
             post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Warning","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"Active","Guild":ctx.message.guild.id}
             await self.db.infractions.insert_one(post)
-            try:
-                await target.send(f":warning: You've been warned for **{reason}** in **{ctx.message.guild}**")
-                await ctx.send(f":ok_hand: Warned **{target}** for *{reason}*")
-            except:
-                await ctx.send(f":ok_hand: A warning has been added to **{target}** for *{reason}\n(I couldn't DM them to notify them of their warning)*")
+            dm = getvars["dm_on_warn"]
+            if dm == "true":
+                try:
+                    await target.send(f":warning: You've been warned for **{reason}** in **{ctx.message.guild}**")
+                    await ctx.send(f":ok_hand: Warned **{target}** for *{reason}*")
+                except:
+                    await ctx.send(f":ok_hand: A warning has been added to **{target}** for *{reason}\n(I couldn't DM them to notify them of their warning)*")
+            if dm == "false":
+                await ctx.send(f":ok_hand: Warning added to **{target}** for *{reason}*")
         try:
             await logchannel.send(embed=warnlog)
         except:
