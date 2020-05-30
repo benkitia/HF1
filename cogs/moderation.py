@@ -54,7 +54,7 @@ class Moderation(commands.Cog):
         dm = getvars["dm_on_ban"]
         if dm == "true":
             dmem = discord.Embed(
-                title = ":boot: Punishent Notification: Ban",
+                title = ":hammer: Punishent Notification: Ban",
                 description = f"""
                 **Reason:** {reason}
                 **Case ID:** {casenumber}
@@ -111,6 +111,26 @@ class Moderation(commands.Cog):
                 await logchannel.send(embed=unbanlog)
             except discord.Forbidden:
                 await ctx.send("<:error:696628928458129488> I can't log this action because I can't speak in the log channel")
+        dm = getvars["dm_on_unban"]
+        if dm == "true":
+            dmem = discord.Embed(
+                title = ":unlock: Punishent Updated: Unban",
+                description = f"""
+                **Reason:** {reason}
+                """,
+                color = 0x6dff88
+            )
+            dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
+            dmem.set_author(
+                name = ctx.message.guild,
+                icon_url = ctx.message.guild.icon_url
+            )
+            try:
+                await target.send(embed=dmem)
+            except:
+                return
+        if dm == "false":
+            return
 
     @commands.command(description="Kicks a user")
     @commands.guild_only()
@@ -288,6 +308,26 @@ class Moderation(commands.Cog):
                 await logchannel.send(embed=unmutelog)
             except discord.Forbidden:
                 await ctx.send("<:error:696628928458129488> I couldn't log this action because I can't send messages in the log channel")
+        dm = getvars["dm_on_unmute"]
+        if dm == "true":
+            dmem = discord.Embed(
+                title = ":loud_sound: Punishent Updated: Unmute",
+                description = f"""
+                **Reason:** {reason}
+                """,
+                color = 0x6dff88
+            )
+            dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
+            dmem.set_author(
+                name = ctx.message.guild,
+                icon_url = ctx.message.guild.icon_url
+            )
+            try:
+                await target.send(embed=dmem)
+            except:
+                return
+        if dm == "false":
+            return
 
     @commands.command(description="Issues a user a warning")
     @commands.guild_only()
