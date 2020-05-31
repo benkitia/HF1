@@ -122,8 +122,9 @@ class Modutils(commands.Cog):
             except discord.Forbidden:
                 return await ctx.send("<:error:696628928458129488> I couldn't remove the role, make sure my highest role is above it")
             await ctx.send(f":ok_hand: Removed {role.name} from {target}")
-        if addorrm != "add" or "remove":
-            return await ctx.send('<:error:696628928458129488> Specify add or remove')
+        if addorrm != "add":
+            if addorrm != "remove":
+                return await ctx.send('<:error:696628928458129488> Specify add or remove')
 
 def setup(bot):
     bot.add_cog(Modutils(bot))
