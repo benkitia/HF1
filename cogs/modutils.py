@@ -107,5 +107,23 @@ class Modutils(commands.Cog):
             return await ctx.send("<:error:696628928458129488> Error deleting infraction")
         await ctx.send(f":ok_hand: Deleted infraction {casenumber}")
 
+    @commands.command(description="Add or removes a role")
+    @commands.has_permissions(manage_roles=True)
+    async def role(self, ctx, addorrm, target:discord.Member, role: discord.Role):
+        if addorrm == "add":
+            try:
+                await target.add_roles(role)
+            except discord.Forbidden:
+                return await ctx.send("<:error:696628928458129488> I couldn't assign the role, make sure my highest role is above it")
+            await ctx.send(f":ok_hand: Added {role.name} to {target}")
+        if addorrm == "remove":
+            try:
+                await target.remove_roles(role)
+            except discord.Forbidden:
+                return await ctx.send("<:error:696628928458129488> I couldn't remove the role, make sure my highest role is above it")
+            await ctx.send(f":ok_hand: Removed {role.name} from {target}")
+        if addorrm != "add" or "remove":
+            return await ctx.send('<:error:696628928458129488> Specify add or remove')
+
 def setup(bot):
     bot.add_cog(Modutils(bot))
