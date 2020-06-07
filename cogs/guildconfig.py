@@ -38,7 +38,7 @@ class GuildConfig(commands.Cog):
                             if value != "false":
                                 if value != "no":
                                     return await ctx.send("<:error:696628928458129488> Invalid option, choose true or false")
-        if "log" or "imagecache" in setting:
+        if "log" in setting:
             try:
                 channel = await TextChannelConverter().convert(ctx, value)
                 value = str(channel.id)
