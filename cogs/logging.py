@@ -12,7 +12,7 @@ class Logging(commands.Cog):
     async def on_message_delete(self, message):
         ctx: commands.Context = await self.bot.get_context(message)
         getvars = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
-        logchannelidstr = getvars["message log"]
+        logchannelidstr = getvars["messagelog"]
         if logchannelidstr == "disabled" or message.author.bot:
             return
         logchannelid = int(logchannelidstr)
@@ -45,7 +45,7 @@ class Logging(commands.Cog):
     async def on_message_edit(self, before, after):
         ctx: commands.Context = await self.bot.get_context(before)
         getvars = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
-        logchannelidstr = getvars["message log"]
+        logchannelidstr = getvars["messagelog"]
         if logchannelidstr == "disabled" or before.author.bot:
             return
         logchannelid = int(logchannelidstr)
@@ -68,7 +68,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         getvars = await self.db.guildconfigs.find_one({"_id":member.guild.id})
-        logchannelidstr = getvars["travel log"]
+        logchannelidstr = getvars["travellog"]
         if logchannelidstr == "disabled":
             return
         logchannelid = int(logchannelidstr)
@@ -83,7 +83,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         getvars = await self.db.guildconfigs.find_one({"_id":member.guild.id})
-        logchannelidstr = getvars["travel log"]
+        logchannelidstr = getvars["travellog"]
         if logchannelidstr == "disabled":
             return
         logchannelid = int(logchannelidstr)
@@ -97,18 +97,30 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
-        if before.nick == after.nick:
-            return
-        getvars = await self.db.guildconfigs.find_one({"_id":before.guild.id})
-        logchannelidstr = getvars["user log"]
-        if logchannelidstr == "disabled":
-            return
-        logchannelid = int(logchannelidstr)
-        logchannel = discord.utils.get(before.guild.text_channels, id=logchannelid)
-        nickem = discord.Embed(description=f"Nickname changed\n**Before:** {before.nick}\n**After:** {after.nick}",color=0xeb88ff)
-        nickem.set_author(icon_url=before.avatar_url, name=f"{before} ({before.id})")
-        nickem.timestamp = datetime.datetime.utcnow()
-        await logchannel.send(embed=nickem)
+        if before.nick != after.nick:
+            getvars = await self.db.guildconfigs.find_one({"_id":before.guild.id})
+            logchannelidstr = getvars["userlog"]
+            if logchannelidstr == "disabled":
+                return
+            logchannelid = int(logchannelidstr)
+            logchannel = discord.utils.get(before.guild.text_channels, id=logchannelid)
+            nickem = discord.Embed(description=f"Nickname changed\n**Before:** {before.nick}\n**After:** {after.nick}",color=0xeb88ff)
+            nickem.set_author(icon_url=before.avatar_url, name=f"{after} ({after.id})")
+            nickem.timestamp = datetime.datetime.utcnow()
+            await logchannel.send(embed=nickem)
+        # if before.avatar_url != after.avatar_url:
+        #     channel
+        #     getvars = await self.db.guildconfigs.find_one({"_id":before.guild.id})
+        #     logchannelidstr = getvars["user log"]
+        #     if logchannelidstr == "disabled":
+        #         return
+        #     logchannelid = int(logchannelidstr)
+        #     logchannel = discord.utils.get(before.guild.text_channels, id=logchannelid)
+        #     avatarem = discord.Embed(description="Before:\n\n\n\n\n\nAfter:")
+        #     avatarem.set_thumbnail(url=before.avatar_url)
+        #     avatarem.set_image(url=after.avatar_url)
+        #     avatarem.set_author(icon_url=before.avatar_url,name=f"{after} ({after.id})")
+        #     await logchannel.send(embed=avatarem)
 
 def setup(bot):
     bot.add_cog(Logging(bot))
