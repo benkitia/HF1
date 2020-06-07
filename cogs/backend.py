@@ -28,7 +28,7 @@ class Backend(commands.Cog):
         botjoinembed = discord.Embed(title="Bot Joined Guild", description=f"**Guild:** {guild.name} ({guild.id})\n **Owner:** {guild.owner} ({guild.owner.id})", color=0x00cfff)
         botjoinembed.timestamp=datetime.utcnow()
         await self.bot.log_channel.send(embed=botjoinembed)
-        newconfig = {"_id":guild.id,"Guild Name":guild.name,"prefix":"-","staff role":"placeholder","admin role":"placeholder","action log":"disabled","message log":"disabled","travel log":"disabled","user log":"disabled","alert channel":"disabled","mute role":"placeholder","filter invites":False,"filter bad words":False}
+        newconfig = {"_id":guild.id,"Guild Name":guild.name,"prefix":"-","staff role":"placeholder","admin role":"placeholder","actionlog":"disabled","messagelog":"disabled","travellog":"disabled","userlog":"disabled","muterole":"placeholder","dm_on_warn":"true","dm_on_mute":"true","dm_on_kick":"true","dm_on_ban":"true","dm_on_unmute":"true","dm_on_unban":"true",}
         self.db.guildconfigs.insert_one(newconfig)
 
     @commands.Cog.listener()
