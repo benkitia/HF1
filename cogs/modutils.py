@@ -107,6 +107,12 @@ class Modutils(commands.Cog):
             return await ctx.send("<:error:696628928458129488> Error deleting infraction")
         await ctx.send(f":ok_hand: Deleted infraction {casenumber}")
 
+    @commands.command(description="Deletes all of a user's punishments")
+    @commands.has_permissions(kick_members=True)
+    async def clearpunishments(self, ctx, target: discord.User):
+        await self.db.infractions.update_many({"Target":target.id, "Guild":ctx.message.guild.id, "Status":"Active"},{"$set":{"Status":"Inactive"}})
+        await ctx.send(f":ok_hand: Deleted all infractions for {target}")
+
     @commands.command(description="Add or removes a role")
     @commands.has_permissions(manage_roles=True)
     async def role(self, ctx, addorrm, target:discord.Member, role: discord.Role):
