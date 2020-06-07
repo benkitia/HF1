@@ -13,6 +13,12 @@ class GuildConfig(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def set(self, ctx, setting, *, value):
+        adminroleidstr = getvars["admin role"]
+        adminroleid = int(adminroleidstr)
+        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
+        if adminrole not in ctx.message.author.roles:
+            missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
+            return await ctx.send(embed=missingperms)
         valid_settings = ['staffrole','adminrole','actionlog','messagelog','travellog','userlog','muterole','dm_on_warn','dm_on_mute','dm_on_kick','dm_on_ban','dm_on_unmute','dm_on_unban']
         if setting not in valid_settings:
             return await ctx.send(f"<:error:696628928458129488> Invalid setting. Valid settings include: `{valid_settings}``")
@@ -44,7 +50,7 @@ class GuildConfig(commands.Cog):
             except:
                 return await ctx.send("<:error:696628928458129488> Invalid role")
             value = str(role.id)
-        self.db.beta_guildconfigs.update_one({"_id":int(ctx.message.guild.id)},{"$set":{setting:value}})
+        self.db.guildconfigs.update_one({"_id":int(ctx.message.guild.id)},{"$set":{setting:value}})
         await ctx.send(f":ok_hand: Changed {setting} to {value}")
 
 def setup(bot):
