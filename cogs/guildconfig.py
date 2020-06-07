@@ -13,8 +13,8 @@ class GuildConfig(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def set(self, ctx, setting, *, value):
-        adminroleidstr = getvars["admin role"]
-        adminroleid = int(adminroleidstr)
+        config = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
+        adminroleid = int(config["admin role"])
         adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
         if adminrole not in ctx.message.author.roles:
             missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
