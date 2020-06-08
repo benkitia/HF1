@@ -16,8 +16,8 @@ class GuildConfig(commands.Cog):
         config = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
         adminroleid = int(config["adminrole"])
         adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
-        if adminrole not in ctx.message.author.roles:
-            if ctx.message.author.id != ctx.guild.owner.id:
+        if ctx.message.author.id != ctx.guild.owner.id:
+            if adminrole not in ctx.message.author.roles:
                 missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
                 return await ctx.send(embed=missingperms)
         valid_settings = ['staffrole','adminrole','actionlog','messagelog','travellog','userlog','muterole','dm_on_warn','dm_on_mute','dm_on_kick','dm_on_ban','dm_on_unmute','dm_on_unban','auto_dehoist']
