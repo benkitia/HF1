@@ -20,10 +20,26 @@ class GuildConfig(commands.Cog):
             if ctx.message.author.id != ctx.guild.owner.id:
                 missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
                 return await ctx.send(embed=missingperms)
-        valid_settings = ['staffrole','adminrole','actionlog','messagelog','travellog','userlog','muterole','dm_on_warn','dm_on_mute','dm_on_kick','dm_on_ban','dm_on_unmute','dm_on_unban']
+        valid_settings = ['staffrole','adminrole','actionlog','messagelog','travellog','userlog','muterole','dm_on_warn','dm_on_mute','dm_on_kick','dm_on_ban','dm_on_unmute','dm_on_unban','auto_dehoist']
         if setting not in valid_settings:
             return await ctx.send(f"<:error:696628928458129488> Invalid setting. Valid settings include: `{valid_settings}``")
         if "dm_on_" in setting:
+            if value == "on":
+                value = "true"
+            if value == "off":
+                value = "false"
+            if value == "yes":
+                value = "true"
+            if value == "no":
+                value = "false"
+            if value != "on":
+                if value != "true":
+                    if value != "yes":
+                        if value != "off":
+                            if value != "false":
+                                if value != "no":
+                                    return await ctx.send("<:error:696628928458129488> Invalid option, choose true or false")
+        if "auto_" in setting:
             if value == "on":
                 value = "true"
             if value == "off":
