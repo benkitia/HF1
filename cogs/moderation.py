@@ -26,10 +26,11 @@ class Moderation(commands.Cog):
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         casenumber = random.randint(1000000000, 9999999999)
-        banlog = discord.Embed(title=f"{target} banned", description=f"""**User:** {target} ({target.id})
-        **Reason:** {reason}
-        **Responsible Moderator:** {ctx.message.author}
-        """, color=0xff1919)
+        banlog = discord.Embed(
+            title=f"{target} banned", 
+            description=f"**User:** {target} ({target.id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}", 
+            color=0xff1919
+            )
         banlog.set_footer(text=f"Case number {casenumber}")
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to ban")
@@ -53,10 +54,7 @@ class Moderation(commands.Cog):
         if dm == "true":
             dmem = discord.Embed(
                 title = ":hammer: Punishent Notification: Ban",
-                description = f"""
-                **Reason:** {reason}
-                **Case ID:** {casenumber}
-                """,
+                description = f"**Reason:** {reason}\n**Case ID:** {casenumber}",
                 color = 0xff1919
             )
             dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
@@ -82,15 +80,20 @@ class Moderation(commands.Cog):
         adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
         if staffrole not in ctx.message.author.roles:
             if adminrole not in ctx.message.author.roles:
-                missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
+                missingperms = discord.Embed(
+                    title="Not so fast",
+                    description="You do not have permission to use this command",
+                    color=0xff0000
+                    )
                 return await ctx.send(embed=missingperms)
         logchannelidstr = config["actionlog"]
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
-        unbanlog = discord.Embed(title=f"{target} unbanned", description=f"""**User:** {target} ({id})
-        **Reason:** {reason}
-        **Responsible Moderator:** {ctx.message.author}
-        """, color=0x6dff88)
+        unbanlog = discord.Embed(
+            title=f"{target} unbanned",
+            description=f"**User:** {target} ({id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}",
+            color=0x6dff88
+            )
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to unban")
         if target == ctx.message.author:
@@ -111,9 +114,7 @@ class Moderation(commands.Cog):
         if dm == "true":
             dmem = discord.Embed(
                 title = ":unlock: Punishent Updated: Unban",
-                description = f"""
-                **Reason:** {reason}
-                """,
+                description = f"**Reason:** {reason}",
                 color = 0x6dff88
             )
             dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
@@ -144,10 +145,11 @@ class Moderation(commands.Cog):
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         casenumber = random.randint(1000000000, 9999999999)
-        kicklog = discord.Embed(title=f"{target} kicked", description=f"""**User:** {target} ({target.id})
-        **Reason:** {reason}
-        **Responsible Moderator:** {ctx.message.author}
-        """, color=0xff8500)
+        kicklog = discord.Embed(
+            title=f"{target} kicked",
+            description=f"**User:** {target} ({target.id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}",
+            color=0xff8500
+            )
         kicklog.set_footer(text=f"Case number {casenumber}")
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to kick")
@@ -172,10 +174,7 @@ class Moderation(commands.Cog):
         if dm == "true":
             dmem = discord.Embed(
                 title = ":boot: Punishent Notification: Kick",
-                description = f"""
-                **Reason:** {reason}
-                **Case ID:** {casenumber}
-                """,
+                description = f"**Reason:** {reason}\n**Case ID:** {casenumber}",
                 color = 0xff8500
             )
             dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
@@ -209,10 +208,11 @@ class Moderation(commands.Cog):
         muteroleid = int(muteroleidstr)
         muterole = discord.utils.get(ctx.guild.roles, id=muteroleid)
         casenumber = random.randint(1000000000, 9999999999)
-        mutelog = discord.Embed(title=f"{target} muted", description=f"""**User:** {target} ({target.id})
-        **Reason:** {reason}
-        **Responsible Moderator:** {ctx.message.author}
-        """, color=0xff8500)
+        mutelog = discord.Embed(
+            title=f"{target} muted",
+            description=f"**User:** {target} ({target.id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}", 
+            color=0xff8500
+            )
         mutelog.set_footer(text=f"Case number {casenumber}")
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to mute")
@@ -239,10 +239,7 @@ class Moderation(commands.Cog):
         if dm == "true":
             dmem = discord.Embed(
                 title = ":mute: Punishent Notification: Mute",
-                description = f"""
-                **Reason:** {reason}
-                **Case ID:** {casenumber}
-                """,
+                description = f"**Reason:** {reason}\n**Case ID:** {casenumber}",
                 color = 0xff8500
             )
             dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
@@ -275,10 +272,10 @@ class Moderation(commands.Cog):
         muteroleidstr = config["muterole"]
         muteroleid = int(muteroleidstr)
         muterole = discord.utils.get(ctx.guild.roles, id=muteroleid)
-        unmutelog = discord.Embed(title=f"{target} unmuted", description=f"""**User:** {target} ({target.id})
-        **Reason:** {reason}
-        **Responsible Moderator:** {ctx.message.author}
-        """, color=0x6dff88)
+        unmutelog = discord.Embed(
+            title=f"{target} unmuted", 
+            description=f"**User:** {target} ({target.id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}", 
+            color=0x6dff88)
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to unmute")
         if target == ctx.message.author:
@@ -335,10 +332,11 @@ class Moderation(commands.Cog):
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         casenumber = random.randint(1000000000, 9999999999)
-        warnlog = discord.Embed(title=f"{target} warned", description=f"""**User:** {target} ({target.id})
-        **Reason:** {reason}
-        **Responsible Moderator:** {ctx.message.author}
-        """, color=0xfff25f)
+        warnlog = discord.Embed(
+            title=f"{target} warned", 
+            description=f"**User:** {target} ({target.id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}", 
+            color=0xfff25f
+            )
         warnlog.set_footer(text=f"Case number {casenumber}")
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to warn")
@@ -351,10 +349,7 @@ class Moderation(commands.Cog):
             if dm == "true":
                 dmem = discord.Embed(
                     title = ":warning: Punishent Notification: Warning",
-                    description = f"""
-                    **Reason:** {reason}
-                    **Case ID:** {casenumber}
-                    """,
+                    description = f"**Reason:** {reason}\n**Case ID:** {casenumber}",
                     color = 0xfff25f
                 )
                 dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")

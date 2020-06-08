@@ -23,8 +23,7 @@ class Name(commands.Cog):
                 logchannel = self.bot.get_channel(logchannelid)
                 log = discord.Embed(
                     title = "Nickname dehoisted",
-                    description = f"""**Hoist charectar:** {hoist_charectar}
-                    **Previous nickname:** {before.nick}""",
+                    description = f"""**Hoist charectar:** {hoist_charectar}\n**Previous nickname:** {before.nick}""",
                     color = 0xff0000
                 )
                 log.set_author(name = f"{before} ({before.id})", icon_url = f"{before.avatar_url}")
