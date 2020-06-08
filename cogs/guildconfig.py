@@ -17,8 +17,9 @@ class GuildConfig(commands.Cog):
         adminroleid = int(config["adminrole"])
         adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
         if adminrole not in ctx.message.author.roles:
-            missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
-            return await ctx.send(embed=missingperms)
+            if ctx.message.author.id != ctx.guild.owner.id:
+                missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
+                return await ctx.send(embed=missingperms)
         valid_settings = ['staffrole','adminrole','actionlog','messagelog','travellog','userlog','muterole','dm_on_warn','dm_on_mute','dm_on_kick','dm_on_ban','dm_on_unmute','dm_on_unban']
         if setting not in valid_settings:
             return await ctx.send(f"<:error:696628928458129488> Invalid setting. Valid settings include: `{valid_settings}``")
