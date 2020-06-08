@@ -43,7 +43,7 @@ class Modutils(commands.Cog):
         if len(casenumber) != 10:
             if len(casenumber) != 15:
                 return await ctx.send("<:error:696628928458129488> Invalid case number: not 10 or 15 digits")
-        result = await self.db.infractions.find_one({"Case Number":case})
+        result = await self.db.infractions.find_one({"Case Number":case, "Guild":ctx.message.guild.id})
         targetid = result["Target"]
         punishtype = result["Punishment Type"]
         target = result["Target Name"]
