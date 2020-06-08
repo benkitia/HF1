@@ -11,7 +11,6 @@ class GuildConfig(commands.Cog):
         self.db = bot.db
 
     @commands.command()
-    @commands.is_owner()
     async def set(self, ctx, setting, *, value):
         config = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
         adminroleid = int(config["adminrole"])
