@@ -59,7 +59,7 @@ class GuildConfig(commands.Cog):
                 channel = await TextChannelConverter().convert(ctx, value)
                 value = str(channel.id)
             except:
-                await ctx.send("<:error:696628928458129488> Invalid channel")
+                return await ctx.send("<:error:696628928458129488> Invalid channel")
         if "role" in setting:
             try:
                 role = await RoleConverter().convert(ctx, value)
