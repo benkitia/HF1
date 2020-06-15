@@ -85,7 +85,7 @@ class Basic(commands.Cog):
 
     @commands.command(description="Returns some bot statistics")
     async def stats(self, ctx):
-        embed=discord.Embed(title="Bot Statistics")
+        embed=discord.Embed(title="Bot Statistics", color=0x5c92ff)
         embed.add_field(name="Guild Count",value=len(list(self.bot.guilds)))
         embed.add_field(name="Total Members",value=len(set(self.bot.get_all_members())))
         await ctx.send(embed=embed)
