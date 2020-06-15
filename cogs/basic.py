@@ -47,9 +47,16 @@ class Basic(commands.Cog):
             user = ctx.message.author
         try:
             avi = user.avatar_url_as(format=avi_format)
-            await ctx.send(avi)
         except:
             return await ctx.send("<:error:696628928458129488> Invalid format. Valid formats include ‘webp’, ‘jpeg’, ‘jpg’, ‘png’ or ‘gif’ (for animated avatars)")
+        embed = discord.Embed(
+            title = "Avatar",
+            color = 0x5c92ff
+        )
+        embed.set_author(name = user, icon_url = user.avatar_url)
+        embed.set_footer(text = f"Requested by {ctx.message.author}")
+        embed.set_image(url = avi)
+        await ctx.send(embed = embed)
 
     @commands.command(description="Returns information about a server",aliases=['server'])
     async def serverinfo(self, ctx, guildid=None):
