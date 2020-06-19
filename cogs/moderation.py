@@ -26,12 +26,29 @@ class Moderation(commands.Cog):
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         casenumber = random.randint(1000000000, 9999999999)
-        banlog = discord.Embed(
-            title=f"{target} banned", 
-            description=f"**User:** {target} ({target.id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}", 
+        log = discord.Embed(
+            description=f"**{target} banned**", 
             color=0xff1919
             )
-        banlog.set_footer(text=f"Case number {casenumber}")
+        log.add_field(
+            name = "User",
+            value = f"{target.mention} ({target.id})"
+        )
+        log.add_field(
+            name = "Responsible Moderator",
+            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
+        )
+        log.add_field(
+            name = "Reason",
+            value = reason
+        )
+        log.add_field(
+            name = "Ban Duration",
+            value = "Indefinite"
+        )
+        log.set_footer(text = casenumber)
+        log.timestamp = datetime.utcnow()
+        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/speaker-with-cancellation-stroke_1f507.png")
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to ban")
         if target == ctx.message.author:
@@ -45,10 +62,10 @@ class Moderation(commands.Cog):
             await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
             try:
-                await logchannel.send(embed=banlog)
+                await logchannel.send(embed=log)
             except discord.Forbidden:
                 await ctx.send("<:error:696628928458129488> I can't log this action because I can't speak in the log channel")
-        post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Ban","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"active","Guild":ctx.message.guild.id}
+        post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Ban","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.utcnow(),"Status":"active","Guild":ctx.message.guild.id}
         await self.db.infractions.insert_one(post)
         dm = config["dm_on_ban"]
         if dm == "true":
@@ -89,11 +106,24 @@ class Moderation(commands.Cog):
         logchannelidstr = config["actionlog"]
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
-        unbanlog = discord.Embed(
-            title=f"{target} unbanned",
-            description=f"**User:** {target} ({id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}",
+        log = discord.Embed(
+            description=f"**{target} unbanned**", 
             color=0x6dff88
             )
+        log.add_field(
+            name = "User",
+            value = f"{target.mention} ({target.id})"
+        )
+        log.add_field(
+            name = "Responsible Moderator",
+            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
+        )
+        log.add_field(
+            name = "Reason",
+            value = reason
+        )
+        log.timestamp = datetime.utcnow()
+        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/open-lock_1f513.png")
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to unban")
         if target == ctx.message.author:
@@ -107,7 +137,7 @@ class Moderation(commands.Cog):
             await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
             try:
-                await logchannel.send(embed=unbanlog)
+                await logchannel.send(embed=log)
             except discord.Forbidden:
                 await ctx.send("<:error:696628928458129488> I can't log this action because I can't speak in the log channel")
         dm = config["dm_on_unban"]
@@ -145,12 +175,25 @@ class Moderation(commands.Cog):
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         casenumber = random.randint(1000000000, 9999999999)
-        kicklog = discord.Embed(
-            title=f"{target} kicked",
-            description=f"**User:** {target} ({target.id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}",
+        log = discord.Embed(
+            description=f"**{target} kicked**", 
             color=0xff8500
             )
-        kicklog.set_footer(text=f"Case number {casenumber}")
+        log.add_field(
+            name = "User",
+            value = f"{target.mention} ({target.id})"
+        )
+        log.add_field(
+            name = "Responsible Moderator",
+            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
+        )
+        log.add_field(
+            name = "Reason",
+            value = reason
+        )
+        log.set_footer(text = casenumber)
+        log.timestamp = datetime.utcnow()
+        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/womans-boots_1f462.png")
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to kick")
         if target == ctx.message.author:
@@ -164,11 +207,11 @@ class Moderation(commands.Cog):
             await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
             try:
-                await logchannel.send(embed=kicklog)
+                await logchannel.send(embed=log)
             except discord.Forbidden:
                 await ctx.send("<:error:696628928458129488> I can't log this action because I can't speak in the log channel")
         casenumber = random.randint(1000000000, 9999999999)
-        post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Kick","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"Active","Guild":ctx.message.guild.id}
+        post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Kick","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.utcnow(),"Status":"Active","Guild":ctx.message.guild.id}
         await self.db.infractions.insert_one(post)
         dm = config["dm_on_kick"]
         if dm == "true":
@@ -208,12 +251,29 @@ class Moderation(commands.Cog):
         muteroleid = int(muteroleidstr)
         muterole = discord.utils.get(ctx.guild.roles, id=muteroleid)
         casenumber = random.randint(1000000000, 9999999999)
-        mutelog = discord.Embed(
-            title=f"{target} muted",
-            description=f"**User:** {target} ({target.id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}", 
+        log = discord.Embed(
+            description=f"**{target} muted**", 
             color=0xff8500
             )
-        mutelog.set_footer(text=f"Case number {casenumber}")
+        log.add_field(
+            name = "User",
+            value = f"{target.mention} ({target.id})"
+        )
+        log.add_field(
+            name = "Responsible Moderator",
+            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
+        )
+        log.add_field(
+            name = "Reason",
+            value = reason
+        )
+        log.add_field(
+            name = "Mute Duration",
+            value = "Indefinite"
+        )
+        log.set_footer(text = casenumber)
+        log.timestamp = datetime.utcnow()
+        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/speaker-with-cancellation-stroke_1f507.png")
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to mute")
         if target == ctx.message.author:
@@ -230,10 +290,10 @@ class Moderation(commands.Cog):
             await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
             try:
-                await logchannel.send(embed=mutelog)
+                await logchannel.send(embed=log)
             except discord.Forbidden:
                 await ctx.send("<:error:696628928458129488> I couldn't log this action because I can't send messages in the log channel")
-        post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Mute","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"Active","Guild":ctx.message.guild.id}
+        post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Mute","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.utcnow(),"Status":"Active","Guild":ctx.message.guild.id}
         await self.db.infractions.insert_one(post)
         dm = config["dm_on_mute"]
         if dm == "true":
@@ -272,10 +332,24 @@ class Moderation(commands.Cog):
         muteroleidstr = config["muterole"]
         muteroleid = int(muteroleidstr)
         muterole = discord.utils.get(ctx.guild.roles, id=muteroleid)
-        unmutelog = discord.Embed(
-            title=f"{target} unmuted", 
-            description=f"**User:** {target} ({target.id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}", 
-            color=0x6dff88)
+        log = discord.Embed(
+            description=f"**{target} unmuted**", 
+            color=0x6dff88
+            )
+        log.add_field(
+            name = "User",
+            value = f"{target.mention} ({target.id})"
+        )
+        log.add_field(
+            name = "Responsible Moderator",
+            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
+        )
+        log.add_field(
+            name = "Reason",
+            value = reason
+        )
+        log.timestamp = datetime.utcnow()
+        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/speaker-with-three-sound-waves_1f50a.png")
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to unmute")
         if target == ctx.message.author:
@@ -292,7 +366,7 @@ class Moderation(commands.Cog):
             await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
         else:
             try:
-                await logchannel.send(embed=unmutelog)
+                await logchannel.send(embed=log)
             except discord.Forbidden:
                 await ctx.send("<:error:696628928458129488> I couldn't log this action because I can't send messages in the log channel")
         dm = config["dm_on_unmute"]
@@ -332,18 +406,31 @@ class Moderation(commands.Cog):
         logchannelid = int(logchannelidstr)
         logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
         casenumber = random.randint(1000000000, 9999999999)
-        warnlog = discord.Embed(
-            title=f"{target} warned", 
-            description=f"**User:** {target} ({target.id})\n**Reason:** {reason}\n**Responsible Moderator:** {ctx.message.author}", 
+        log = discord.Embed(
+            description=f"**{target} warned**", 
             color=0xfff25f
             )
-        warnlog.set_footer(text=f"Case number {casenumber}")
+        log.add_field(
+            name = "User",
+            value = f"{target.mention} ({target.id})"
+        )
+        log.add_field(
+            name = "Responsible Moderator",
+            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
+        )
+        log.add_field(
+            name = "Reason",
+            value = reason
+        )
+        log.set_footer(text = casenumber)
+        log.timestamp = datetime.utcnow()
+        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/155/warning-sign_26a0.png")
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to warn")
         if target == ctx.message.author:
            return await ctx.send("<:error:696628928458129488> You cannot warn yourself")
         else:
-            post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Warning","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.now(),"Status":"Active","Guild":ctx.message.guild.id}
+            post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Warning","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.utcnow(),"Status":"Active","Guild":ctx.message.guild.id}
             await self.db.infractions.insert_one(post)
             dm = config["dm_on_warn"]
             if dm == "true":
@@ -365,7 +452,7 @@ class Moderation(commands.Cog):
             if dm == "false":
                 await ctx.send(f":ok_hand: Warning added to **{target}** for *{reason}*")
         try:
-            await logchannel.send(embed=warnlog)
+            await logchannel.send(embed=log)
         except:
             await ctx.send(":(")
 
