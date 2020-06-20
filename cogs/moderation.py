@@ -48,7 +48,7 @@ class Moderation(commands.Cog):
         )
         log.set_footer(text = casenumber)
         log.timestamp = datetime.utcnow()
-        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/speaker-with-cancellation-stroke_1f507.png")
+        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/hammer_1f528.png")
         if target == None:
             return await ctx.send("<:error:696628928458129488> You must provide a valid user to ban")
         if target == ctx.message.author:
