@@ -11,6 +11,8 @@ class Name(commands.Cog):
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         if before.nick == after.nick:
             return
+        if after.nick == None:
+            return
         config = await self.db.guildconfigs.find_one({"_id":before.guild.id})
         auto_dehoist = config["auto_dehoist"]
         if auto_dehoist == "false":
