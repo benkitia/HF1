@@ -42,14 +42,14 @@ Syntax: `ping`
 Returns information about the bot  
 Syntax: `botinfo`
 
-### avatar
+#### avatar
 
 Returns a user's avatar in your desired file format  
 Syntax: `avatar <user> [format]`  
 The default format is png, so if you don't specify a format that's what the bot will return  
 Accepted formats include: webp, jpeg, jpg, png or gif (for animated avatars only)
 
-### serverinfo 
+#### serverinfo
 
 Returns information about a server  
 Syntax: `serverinfo [guild ID]`  
