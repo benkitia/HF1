@@ -52,6 +52,6 @@ Accepted formats include: webp, jpeg, jpg, png or gif (for animated avatars only
 ### serverinfo 
 
 Returns information about a server  
-Syntax `serverinfo [guild ID]`  
-Aliases: server
+Syntax: `serverinfo [guild ID]`  
+Aliases: server  
 If you don't specify a guild it will default to the guild the command is run in
