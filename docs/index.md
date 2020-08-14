@@ -55,3 +55,19 @@ Returns information about a server
 Syntax: `serverinfo [guild ID]`  
 Aliases: server  
 If you don't specify a guild it will default to the guild the command is run in
+
+### Guild Config
+
+#### set
+
+Edits guild settings  
+Syntax: `set <setting> <value>`  
+Accepted settings include: staffrole, adminrole, actionlog, messagelog, travellog, userlog, muterole, dm_on_warn, dm_on_mute, dm_on_kick, dm_on_ban, dm_on_unmute, dm_on_unban, auto_dehoist  
+Values for role settings should be a role ID, role mention, or role name  
+Values for log/channel settings should be a channel ID, channel mention, or channel name  
+Values for dm_on_x settings should be true or false  
+
+#### settings
+
+Shows a list of the guild's current configuration  
+Syntax: `settings`  
