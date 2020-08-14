@@ -72,3 +72,35 @@ Values for dm_on_x settings should be true or false
 
 Shows a list of the guild's current configuration  
 Syntax: `settings`  
+
+### Moderation
+
+#### ban
+
+Bans a user  
+Syntax: `ban <user> [reason]`  
+
+#### unban
+
+Unbans a user  
+Syntax: `unban <user> [reason]`  
+
+#### kick
+
+Kicks a user  
+Syntax: `kick <user> [reason]`
+
+#### mute
+
+Applies the designated mute role to a user  
+Syntax: `mute <user> [reason]`
+
+#### unmute
+
+Removes the designated mute role from a user  
+Syntax: `unmute <user> [reason]`
+
+#### warn
+
+Warns a user/applies a warning infraction  
+Syntax: `warn <user> [reason]`
