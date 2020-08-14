@@ -35,7 +35,7 @@ More info/privacy policy is available [here](https://wafflebot.rocks/privacy)
 ## Commands
 
 All commands must be preceeded with the bot's prefix. Default is `-`, but your server may have a different prefix set.  
-<indicates required arguements> [indicates optional arguements]. You SHOULD NOT include <> [] when running the command
+`<indicates required arguements>` `[indicates optional arguements]`. You SHOULD NOT include <> [] when running the command
 
 ### Basic
 
