@@ -28,7 +28,8 @@ A: wafflebot is written in [discord.py](https://github.com/Rapptz/discord.py)
 
 ## Commands
 
-All commands must be preceeded with the bot's prefix. Default is `-`, but your server may have a different prefix set.
+All commands must be preceeded with the bot's prefix. Default is `-`, but your server may have a different prefix set.  
+<indicates required arguements> [indicates optional arguements]. You SHOULD NOT include <> [] when running the command
 
 ### Basic
 
