@@ -21,6 +21,7 @@ Q: What language is wafflebot written in?
 A: wafflebot is written in [discord.py](https://github.com/Rapptz/discord.py)  
 
 ## Credits  
+
 [wAffles#0001](https://bensonkitia.me) - Lead Developer  
 [derw#0387](https://derw.xyz) - Technical assistance + DB hosting  
 [Blue#9588](https://nambiar.dev) - discord.py assistance  
