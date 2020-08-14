@@ -104,3 +104,53 @@ Syntax: `unmute <user> [reason]`
 
 Warns a user/applies a warning infraction  
 Syntax: `warn <user> [reason]`
+
+### (Staff) Utilities
+
+#### userinfo
+
+Retrieves information about a user's account and presents it in an easy-to-read embed format  
+Sytax: `userinfo [user]`  
+Aliases: profile, info  
+If you don't specify a user it will retrieve your information
+
+#### clear
+
+Purges a specified amount of messages from the current channel  
+Sytax: `clear <amount>`  
+Aliases: purge, purgeall  
+Limit is 300 messages per command use to avoid accidental nuking
+
+#### punishinfo
+
+Retrieves information about an infraction  
+Syntax: `punishinfo <case/punishment ID>`  
+Aliases: inf, infraction
+
+#### search
+
+Retrieves a list of a user's active infractions  
+Syntax: `search <user>`  
+Aliases: infractions
+
+#### searchall
+
+Retrieves a list of all infractions issued to a user, inacive or deleted  
+Syntax: `searchall <user>`  
+Aliases: allinfractions
+
+#### rmpunish
+
+Deletes an infraction  
+Sytax: `rmpunish <case/punishment ID>`  
+Aliases: delinfraction
+
+#### clearpunishments
+
+Deletes all of a user's active infractions  
+Syntax: `clearpunishments <user>`
+
+#### role
+
+Adds or removes a role from a user  
+Syntax: `role <add|remove> <user> <role>`
