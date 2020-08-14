@@ -27,6 +27,11 @@ A: wafflebot is written in [discord.py](https://github.com/Rapptz/discord.py)
 [Blue#9588](https://nambiar.dev) - discord.py assistance  
 [Moo#8008](https://twitter.com/TwoOneOink) - discord.py assistance and emotional support  
 
+# Privacy
+
+In summary, the bot only collects user and server IDs when neccessary (mostly for infractions). The bot does not store any user account data beyond user IDs.  
+More info/privacy policy is available [here](https://wafflebot.rocks/privacy)
+
 ## Commands
 
 All commands must be preceeded with the bot's prefix. Default is `-`, but your server may have a different prefix set.  
