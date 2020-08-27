@@ -13,6 +13,7 @@ dnspython = "*"
 aiohttp = "*"
 openpyxl = "*"
 asyncio = "*"
+discord = "*"
 
 [requires]
 python_version = "3.8"
