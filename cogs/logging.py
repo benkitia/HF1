@@ -21,7 +21,7 @@ class Logging(commands.Cog):
         content = ctx.message.content
         if not content:
             content = "[No Content]"
-        log = discord.Embed(description=f"{ctx.message.author.mention} deleted a message deleted from {ctx.message.channel.mention}:", color=0xff1919)
+        log = discord.Embed(description=f"{ctx.message.author.mention}'s message was deleted from {ctx.message.channel.mention}:", color=0xff1919)
         log.add_field(
             name = "Content",
             value = content,
@@ -67,7 +67,7 @@ class Logging(commands.Cog):
         if before_content == after_content:
             return
         log = discord.Embed(
-            description=f"{ctx.message.author.mention} edited a message in {ctx.message.channel.mention}:", 
+            description=f"[Jump to message]({ctx.message.jump_url})\n{ctx.message.author.mention} edited a message in {ctx.message.channel.mention}:", 
             color=0xff8500
             )
         log.add_field(
