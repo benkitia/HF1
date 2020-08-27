@@ -4,6 +4,7 @@ from discord.ext.commands import RoleConverter, TextChannelConverter
 from datetime import datetime, date, time
 import time
 
+
 class GuildConfig(commands.Cog):
 
     def __init__(self, bot):
@@ -12,14 +13,16 @@ class GuildConfig(commands.Cog):
 
     @commands.command()
     async def set(self, ctx, setting, *, value):
-        config = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
+        config = await self.db.guildconfigs.find_one({"_id": ctx.message.guild.id})
         if ctx.message.author.id != ctx.message.guild.owner.id:
             adminroleid = int(config["adminrole"])
             adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
             if adminrole not in ctx.message.author.roles:
-                missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
+                missingperms = discord.Embed(
+                    title="Not so fast", description="You do not have permission to use this command", color=0xff0000)
                 return await ctx.send(embed=missingperms)
-        valid_settings = ['staffrole','adminrole','actionlog','messagelog','travellog','userlog','muterole','dm_on_warn','dm_on_mute','dm_on_kick','dm_on_ban','dm_on_unmute','dm_on_unban','auto_dehoist']
+        valid_settings = ['staffrole', 'adminrole', 'actionlog', 'messagelog', 'travellog', 'userlog', 'muterole',
+                          'dm_on_warn', 'dm_on_mute', 'dm_on_kick', 'dm_on_ban', 'dm_on_unmute', 'dm_on_unban', 'auto_dehoist']
         if setting not in valid_settings:
             return await ctx.send(f"<:error:696628928458129488> Invalid setting. Valid settings include: `{valid_settings}`")
         if "dm_on_" in setting:
@@ -66,18 +69,20 @@ class GuildConfig(commands.Cog):
             except:
                 return await ctx.send("<:error:696628928458129488> Invalid role")
             value = str(role.id)
-        self.db.guildconfigs.update_one({"_id":int(ctx.message.guild.id)},{"$set":{setting:value}})
+        self.db.guildconfigs.update_one({"_id": int(ctx.message.guild.id)}, {
+                                        "$set": {setting: value}})
         await ctx.send(f":ok_hand: Changed {setting} to {value}")
 
     @commands.command(description='Returns a list of settings')
     @commands.is_owner()
     async def settings(self, ctx):
-        config = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
+        config = await self.db.guildconfigs.find_one({"_id": ctx.message.guild.id})
         if ctx.message.author.id != ctx.message.guild.owner.id:
             adminroleid = int(config["adminrole"])
             adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
             if adminrole not in ctx.message.author.roles:
-                missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
+                missingperms = discord.Embed(
+                    title="Not so fast", description="You do not have permission to use this command", color=0xff0000)
                 await ctx.send(embed=missingperms)
         try:
             staffroleid = int(config["staffrole"])
@@ -98,13 +103,13 @@ class GuildConfig(commands.Cog):
         except:
             muterole = "Unset; do -set muterole"
         embed = discord.Embed(
-            title = "Server Settings",
-            color = 0xD99740
+            title="Server Settings",
+            color=0xD99740
         )
         embed.add_field(
-            name = "Roles",
-            value = f"**Staff role:** {staffrole}\n**Admin role:** {adminrole}\n**Mute role:** {muterole}",
-            inline = False
+            name="Roles",
+            value=f"**Staff role:** {staffrole}\n**Admin role:** {adminrole}\n**Mute role:** {muterole}",
+            inline=False
         )
         try:
             actionlogid = int(config["actionlog"])
@@ -143,9 +148,9 @@ class GuildConfig(commands.Cog):
         except:
             imagecache = "disabled"
         embed.add_field(
-            name = "Channels",
-            value = f"**Action log:** {actionlog}\n**Message log:** {messagelog}\n**Travel log:** {travellog}\n**User log:** {userlog}\n**Auto Moderation log:** {automodlog}\n**Image Cache Channel:** {imagecache}",
-            inline = False
+            name="Channels",
+            value=f"**Action log:** {actionlog}\n**Message log:** {messagelog}\n**Travel log:** {travellog}\n**User log:** {userlog}\n**Auto Moderation log:** {automodlog}\n**Image Cache Channel:** {imagecache}",
+            inline=False
         )
         dm_on_warn = config["dm_on_warn"]
         dm_on_mute = config["dm_on_mute"]
@@ -154,20 +159,20 @@ class GuildConfig(commands.Cog):
         dm_on_unban = config["dm_on_unban"]
         dm_on_unmute = config["dm_on_unmute"]
         embed.add_field(
-            name = "Infraction Settings",
-            value = f"**DM on warn:** {dm_on_warn}\n**DM on mute:** {dm_on_mute}\n**DM on kick:** {dm_on_kick}\n**DM on ban:** {dm_on_ban}\n**DM on unmute:** {dm_on_unmute}\n**DM on unban:** {dm_on_unban}",
-            inline = False
+            name="Infraction Settings",
+            value=f"**DM on warn:** {dm_on_warn}\n**DM on mute:** {dm_on_mute}\n**DM on kick:** {dm_on_kick}\n**DM on ban:** {dm_on_ban}\n**DM on unmute:** {dm_on_unmute}\n**DM on unban:** {dm_on_unban}",
+            inline=False
         )
         autodehoist = config["auto_dehoist"]
         embed.add_field(
-            name = "Auto Moderation Settings",
-            value = f"**Auto Dehoist:** {autodehoist}",
-            inline = False
+            name="Auto Moderation Settings",
+            value=f"**Auto Dehoist:** {autodehoist}",
+            inline=False
         )
-        embed.set_author(icon_url=ctx.message.guild.icon_url, name=ctx.message.guild)
+        embed.set_author(icon_url=ctx.message.guild.icon_url,
+                         name=ctx.message.guild)
         await ctx.send(embed=embed)
 
-        
 
 def setup(bot):
     bot.add_cog(GuildConfig(bot))
