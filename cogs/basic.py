@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 from datetime import datetime, date, time
 import time
+from discord.ext.commands.cooldowns import BucketType
+
 
 class Basic(commands.Cog):
 
@@ -85,26 +87,37 @@ class Basic(commands.Cog):
 
     @commands.command(description="Returns some bot statistics")
     async def stats(self, ctx):
-        embed=discord.Embed(title="Bot Statistics", color=0x5c92ff)
-        embed.add_field(name="Guild Count",value=len(list(self.bot.guilds)))
-        embed.add_field(name="Total Members",value=len(set(self.bot.get_all_members())))
+        embed = discord.Embed(title="Bot Statistics", color=0x5c92ff)
+        embed.add_field(name="Guild Count", value=len(list(self.bot.guilds)))
+        embed.add_field(name="Total Members", value=len(
+            set(self.bot.get_all_members())))
         await ctx.send(embed=embed)
 
-    @commands.command(description="Sends a request for any data the bot has related to you or your guild. Use this command sparingly")
+    @commands.command(description="Sends a request for any data the bot has related to you or your guild. Use this command sparingly as there is a cooldown of 30 days.")
+    @commands.cooldown(1, 2592000, commands.BucketType.user)
     async def requestdata(self, ctx, purpose):
         if purpose != "self":
             if purpose != "server":
-                return await ctx.send("Choose self or server")
+                return await ctx.send("Choose self or server i.e `requestdata self`")
         if purpose == "server":
             if ctx.message.author.id != ctx.message.guild.owner.id:
                 return await ctx.send("You must be the server owner to request server data")
             serverrequest = discord.Embed(
-                title = "Guild Data Request",
-                description = f"Guild ID: {ctx.message.guild.id}\nOwner ID: {ctx.message.guild.owner.id}"
+                title="Guild Data Request",
+                description=f"Guild ID: {ctx.message.guild.id}\nOwner ID: {ctx.message.guild.owner.id}"
             )
             channel = self.bot.get_channel(720787306122051726)
             await channel.send(embed=serverrequest)
-            await ctx.send(":ok_hand: Data request sent. You must be in this server in order to receive the data package: https://bit.ly/waffles-bots\nIf you don't receive an update within 72 hours, email privacy@bensonkitia.me\nWe care about your data and privacy, more info here http://privacy.bensonkitia.me")
+            await ctx.send(":ok_hand: Data request sent. You must be in this server in order to receive the data package: https://wafflebot.rocks/discord\nIf you don't receive an update within 72 hours, email privacy@bensonkitia.me\nWe care about your data and privacy, more info here <http://privacy.bensonkitia.me>")
+        if purpose == "self":
+            selfrequest = discord.Embed(
+                title="User Data Request",
+                description=f"ID: {ctx.message.author.id}"
+            )
+            channel = self.bot.get_channel(720787306122051726)
+            await channel.send(embed=selfrequest)
+            await ctx.send(":ok_hand: Data request sent. You must be in this server in order to receive the data package: https://wafflebot.rocks/discord\nIf you don't receive an update within 72 hours, shoot a message in the support channel\nWe care about your data and privacy, more info here https://wafflebot.rocks/privacy")
+
 
 def setup(bot):
     bot.add_cog(Basic(bot))
