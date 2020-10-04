@@ -62,6 +62,13 @@ class Basic(commands.Cog):
         embed.set_image(url=avi)
         await ctx.send(embed=embed)
 
+    @commands.command(description="Returns an enlarged version of an emoji. This does not work on default Discord emojis.", aliases=['jumbo', 'bigify'])
+    async def enlarge(self, ctx, emoji: discord.Emoji):
+        try:
+            await ctx.send(emoji.url)
+        except:
+            await ctx.send("<:error:696628928458129488> Invalid emoji. (This command doesn't work with default Discord emoji)")
+
     @commands.command(description="Returns information about a server", aliases=['server'])
     async def serverinfo(self, ctx, guildid=None):
         if guildid == None:
