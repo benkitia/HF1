@@ -8,24 +8,24 @@ If you looked for a solution to your problem in the docs below but couldn't find
 
 ## Getting started
 
-You can add wafflebot to your server [here](https://discord.com/oauth2/authorize?client_id=582380938667884548&permissions=8&scope=bot)  
+You can add wafflebot to your server [here](https://discord.com/oauth2/authorize?client_id=582380938667884548&permissions=8&scope=bot)
 
 When wafflebot is first added to the server, many commands won't work without a staff and admin role set. The server owner should run the `help set` command and set all the values listed. You'll want to have a staff and/or admin role, and you can set the two values to be the same
 
 ## FAQ
 
 Q: Can I host my own instance of wafflebot? Is it open-source
-A: No, you cannot host your own instance of wafflebot and the bot is closed-source  
+A: No, you cannot host your own instance of wafflebot and the bot is closed-source
 
 Q: What language is wafflebot written in?
-A: wafflebot is written in [discord.py](https://github.com/Rapptz/discord.py)  
+A: wafflebot is written in [discord.py](https://github.com/Rapptz/discord.py)
 
-## Credits  
+## Credits
 
 [wAffles#0001](https://bensonkitia.me) - Lead Developer  
 [derw#0387](https://derw.xyz) - Technical assistance + DB hosting  
 [Blue#9588](https://nambiar.dev) - discord.py assistance  
-[Moo#8008](https://twitter.com/TwoOneOink) - discord.py assistance and emotional support  
+[Moo#8008](https://twitter.com/TwoOneOink) - discord.py assistance and emotional support
 
 ## Privacy
 
@@ -56,6 +56,13 @@ Syntax: `avatar <user> [format]`
 The default format is png, so if you don't specify a format that's what the bot will return  
 Accepted formats include: webp, jpeg, jpg, png or gif (for animated avatars only)
 
+#### enlarge
+
+Returns an enlarged version of an emoji
+Syntax: `enlarge <emoji>`
+Aliases: jumbo, bigify
+This does not work on default Discord emojis
+
 #### serverinfo
 
 Returns information about a server  
@@ -72,24 +79,24 @@ Syntax: `set <setting> <value>`
 Accepted settings include: staffrole, adminrole, actionlog, messagelog, travellog, userlog, muterole, dm_on_warn, dm_on_mute, dm_on_kick, dm_on_ban, dm_on_unmute, dm_on_unban, auto_dehoist  
 Values for role settings should be a role ID, role mention, or role name  
 Values for log/channel settings should be a channel ID, channel mention, or channel name  
-Values for dm_on_x settings should be true or false  
+Values for dm_on_x settings should be true or false
 
 #### settings
 
 Shows a list of the guild's current configuration  
-Syntax: `settings`  
+Syntax: `settings`
 
 ### Moderation
 
 #### ban
 
 Bans a user  
-Syntax: `ban <user> [reason]`  
+Syntax: `ban <user> [reason]`
 
 #### unban
 
 Unbans a user  
-Syntax: `unban <user> [reason]`  
+Syntax: `unban <user> [reason]`
 
 #### kick
 
