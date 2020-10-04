@@ -58,9 +58,9 @@ Accepted formats include: webp, jpeg, jpg, png or gif (for animated avatars only
 
 #### enlarge
 
-Returns an enlarged version of an emoji
-Syntax: `enlarge <emoji>`
-Aliases: jumbo, bigify
+Returns an enlarged version of an emoji  
+Syntax: `enlarge <emoji>`  
+Aliases: jumbo, bigify  
 This does not work on default Discord emojis
 
 #### serverinfo
