@@ -193,27 +193,6 @@ class Utilities(commands.Cog):
         await self.db.infractions.update_many({"target": str(target.id), "guild": str(ctx.message.guild.id), "status": "active"}, {"$set": {"status": "inactive"}})
         await self.functions.confirm_action(ctx, "infractions cleared")
 
-    @commands.command(description="Add or removes a role")
-    async def role(self, ctx, add_or_remove, target: discord.Member, role: discord.Role):
-        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
-        if not staff:
-            return
-        if add_or_remove == "add":
-            try:
-                await target.add_roles(role)
-            except discord.Forbidden:
-                return await self.functions.handle_error(ctx, "Unable to assign role", "Make sure my highest role is above it and I have manage roles permissions")
-            await self.functions.confirm_action(ctx, f"Added role {role.name} to {target.mention}")
-        if add_or_remove == "remove":
-            try:
-                await target.remove_roles(role)
-            except discord.Forbidden:
-                return await self.functions.handle_error(ctx, "Unable to remove role", "Make sure my highest role is above it and I have manage roles permissions")
-            await self.functions.confirm_action(ctx, f"Removed role {role.name} from {target.mention}")
-        if add_or_remove != "add":
-            if add_or_remove != "remove":
-                return await self.functions.handle_error(ctx, "Specify add or remove")
-
 
 def setup(bot):
     bot.add_cog(Utilities(bot))
