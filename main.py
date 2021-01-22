@@ -5,11 +5,16 @@ import discord
 from discord.ext import commands
 from datetime import datetime
 from config import Config
+from functions import Functions
 from aiohttp import ClientSession
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pymongo.errors import ServerSelectionTimeoutError
 import pymongo
 from pymongo import MongoClient
+
+intents = discord.Intents.default()
+intents.members = True
+intents.guilds = True
 
 DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")
 
@@ -23,11 +28,13 @@ class WaffleBot(commands.Bot):
     def __init__(self):
         super().__init__(
             command_prefix='-',
-            description="A simple yet powerful moderation bot. Written in discord.py"
+            description="A simple yet powerful moderation bot. Written in discord.py",
+            intents=intents
         )
 
         self.config = Config()
         self.db: AsyncIOMotorDatabase
+        self.functions = Functions()
 
         for cog in cogs:
             self.load_extension(cog)
