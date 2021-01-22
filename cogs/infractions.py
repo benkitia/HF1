@@ -13,6 +13,9 @@ class Utilities(commands.Cog):
 
     @commands.command(description="Pulls information about an infraction", aliases=['inf', 'punishinfo'])
     async def infraction(self, ctx, infraction_id):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
         if len(infraction_id) != 12:
             return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction IDs are 12 characters")
         infraction = await self.db.infractions.find_one({"_id": infraction_id, "guild": str(ctx.message.guild.id)})
@@ -87,8 +90,10 @@ class Utilities(commands.Cog):
         await ctx.send(embed = embed)
 
     @commands.command(description="Pulls user's active infractions", aliases=['infs','search'])
-    @commands.has_permissions(kick_members=True)
     async def infractions(self, ctx, user_id):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
         try: 
             user = await self.bot.fetch_user(int(user_id))
         except:
@@ -127,6 +132,9 @@ class Utilities(commands.Cog):
 
     @commands.command(description = "Pulls user's active and inactive infractions", aliases=['searchall','allinfs'])
     async def allinfractions(self, ctx, user_id):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
         try: 
             user = await self.bot.fetch_user(int(user_id))
         except:
@@ -162,8 +170,10 @@ class Utilities(commands.Cog):
         await ctx.send(embed = embed)
 
     @commands.command(description = "Removes an infraction from a user", aliases = ['rmpunish','delinf'])
-    @commands.has_permissions(kick_members=True)
     async def delinfraction(self, ctx, infraction_id):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
         if len(infraction_id) != 12:
             return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction IDs are 12 characters")
         infraction = await self.db.infractions.find_one({"_id": infraction_id, "guild": str(ctx.message.guild.id)})
@@ -176,13 +186,18 @@ class Utilities(commands.Cog):
         await self.functions.confirm_action(ctx, "infraction removed")
 
     @commands.command(description = "Deletes all of a user's infractions", aliases = ['clearinfractions','clearinfs','delallinfs'])
-    @commands.has_permissions(kick_members=True)
     async def delallinfractions(self, ctx, target: discord.User):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
         await self.db.infractions.update_many({"target": str(target.id), "guild": str(ctx.message.guild.id), "status": "active"}, {"$set": {"status": "inactive"}})
         await self.functions.confirm_action(ctx, "infractions cleared")
 
     @commands.command(description="Add or removes a role")
     async def role(self, ctx, add_or_remove, target: discord.Member, role: discord.Role):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
         if add_or_remove == "add":
             try:
                 await target.add_roles(role)

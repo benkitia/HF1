@@ -12,8 +12,10 @@ class Utilities(commands.Cog):
 		self.functions = bot.functions
 
 	@commands.command(aliases = ['purge', 'purgeall'])
-	@commands.is_owner()
     async def clear(self, ctx, amount=10):
+		staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
         if amount > 300:
             return await self.functions.handle_error(ctx, "You can only purge up to 300 messages at a time")
         try:
