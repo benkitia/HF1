@@ -5,3 +5,6 @@ __pycache__
 main.py
 cogs/__pycache__/admin.cpython-38.pyc
 *.pyc
+.DS_Store
+config.py
+cogs/tests.py

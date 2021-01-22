@@ -1,575 +1,550 @@
 import discord
 from discord.ext import commands
 import random
+import string
 from datetime import datetime, date, time
 import time
+import pause
+import dateparser
 
 class Moderation(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.config = bot.config
         self.db = bot.db
+        self.functions = bot.functions
 
-    @commands.command(description="Bans a user")
-    @commands.guild_only()
-    async def ban(self, ctx, target:discord.User=None, *, reason=None):
-        config = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
-        staffroleid = int(config["staffrole"])
-        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
-        adminroleid = int(config["adminrole"])
-        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
-        if staffrole not in ctx.message.author.roles:
-            if adminrole not in ctx.message.author.roles:
-                missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
-                return await ctx.send(embed=missingperms)
-        logchannelidstr = config["actionlog"]
-        logchannelid = int(logchannelidstr)
-        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
-        casenumber = random.randint(1000000000, 9999999999)
-        log = discord.Embed(
-            description=f"**{target} banned**", 
-            color=0xff1919
-            )
-        log.add_field(
-            name = "User",
-            value = f"{target.mention} ({target.id})"
+    async def confirm_infraction(self, ctx, verb : str, target : discord.User, notified : bool, infraction_id = None):
+        embed = discord.Embed(
+            description = f"{target.mention} has been {verb}",
+            color = 0x43e286
         )
-        log.add_field(
-            name = "Responsible Moderator",
-            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
-        )
-        log.add_field(
-            name = "Reason",
-            value = reason
-        )
-        log.add_field(
-            name = "Ban Duration",
-            value = "Indefinite"
-        )
-        log.set_footer(text = casenumber)
-        log.timestamp = datetime.utcnow()
-        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/hammer_1f528.png")
-        if target == None:
-            invaliduser = discord.Embed(
-                description = "You must provide a valid user to ban",
-                color = 0xf34141
-            )
-            invaliduser.set_author(name = "Error")
-            return await ctx.send(embed = invaliduser)
-        if target == ctx.message.author:
-            silly = discord.Embed(
-                description = "You cannot ban yourself",
-                color = 0xf34141
-            )
-            silly.set_author(name = "Error")
-            return await ctx.send(embed =  silly)
+        embed.set_author(name = "Infraction Submitted Successfully")
+        if not notified:
+            notified = "Unable to notify user"
+        else:
+            notified = "User notified"
+        if not infraction_id:
+            infraction_id = ''
+        embed.set_footer(text = f"{infraction_id} • {notified}")
+        embed.timestamp = datetime.utcnow()
+        await ctx.send(embed = embed)
+    
+    async def generate_infraction_id(self):
+        letters = ''.join(random.choice(string.ascii_letters) for i in range(6)).upper()
+        numbers = str(random.randint(100000, 999999))
+        return letters + numbers
+    
+    async def check_hierarchy(self, ctx, mod : discord.Member, target : discord.User):
         try:
-            await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")
-            confirmation = discord.Embed(
-                description = f"Banned {target} ({target.id})",
-                color = 0x5c92ff
-            )
-            confirmation.set_author(name = "Punishment Submitted Successfully")
-            confirmation.set_footer(text =  casenumber)
-            confirmation.timestamp = datetime.utcnow()
-            await ctx.send(embed = confirmation)
-        except discord.Forbidden:
-            banforbidden = discord.Embed(
-                description = "I was unable to ban this user. Make sure my highest role is above their's and I have ban members permissions",
-                color = 0xf34141
-            )
-            banforbidden.set_author(name = "Error")
-            banforbidden.timestamp = datetime.utcnow()
-            return await ctx.send(embed = banforbidden)
-        if not logchannel:
-            pass
-        else:
-            try:
-                await logchannel.send(embed=log)
-            except discord.Forbidden:
-                logforbidden = discord.Embed(
-                    description = "I was unable to log this action because I can't send messages in the designated log channel",
-                    color = 0xf34141
-                )
-                logforbidden.set_author(name = "Error")
-                logforbidden.timestamp = datetime.utcnow()
-                await ctx.send(embed = logforbidden)
-        post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Ban","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.utcnow(),"Status":"active","Guild":ctx.message.guild.id}
-        await self.db.infractions.insert_one(post)
-        dm = config["dm_on_ban"]
-        if dm == "true":
-            dmem = discord.Embed(
-                title = ":hammer: Punishent Notification: Ban",
-                description = f"**Reason:** {reason}\n**Case ID:** {casenumber}",
-                color = 0xff1919
-            )
-            dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
-            dmem.set_author(
-                name = ctx.message.guild,
-                icon_url = ctx.message.guild.icon_url
-            )
-            try:
-                await target.send(embed=dmem)
-            except:
-                return
-        if dm == "false":
-            return
-
-    @commands.command(description="Removes a user's ban")
-    @commands.guild_only()
-    async def unban(self, ctx, id:int=None, *, reason=None):
-        target = await self.bot.fetch_user(id)
-        config = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
-        staffroleid = int(config["staffrole"])
-        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
-        adminroleid = int(config["adminrole"])
-        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
-        if staffrole not in ctx.message.author.roles:
-            if adminrole not in ctx.message.author.roles:
-                missingperms = discord.Embed(
-                    title="Not so fast",
-                    description="You do not have permission to use this command",
-                    color=0xff0000
-                    )
-                return await ctx.send(embed=missingperms)
-        logchannelidstr = config["actionlog"]
-        logchannelid = int(logchannelidstr)
-        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
-        log = discord.Embed(
-            description=f"**{target} unbanned**", 
-            color=0x6dff88
-            )
-        log.add_field(
-            name = "User",
-            value = f"{target.mention} ({target.id})"
-        )
-        log.add_field(
-            name = "Responsible Moderator",
-            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
-        )
-        log.add_field(
-            name = "Reason",
-            value = reason
-        )
-        log.timestamp = datetime.utcnow()
-        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/open-lock_1f513.png")
-        if target == None:
-            invaliduser = discord.Embed(
-                description = "You must provide a valid user to unban",
-                color = 0xf34141
-            )
-            invaliduser.set_author(name = "Error")
-            return await ctx.send(embed = invaliduser)
-        if target == ctx.message.author:
-            return await ctx.send("<:error:696628928458129488> You cannot unban yourself")
-        try:
-            await ctx.guild.unban(target, reason=f"Action by {ctx.message.author} for {reason}")
-            await ctx.send(f":ok_hand: Unbanned **{target}** for *{reason}*")
-        except discord.Forbidden:
-            unbanforbidden = discord.Embed(
-                description = "I was unable to unban this user. Make sure my highest role is above their's and I have ban members permissions",
-                color = 0xf34141
-            )
-            unbanforbidden.set_author(name = "Error")
-            unbanforbidden.timestamp = datetime.utcnow()
-            return await ctx.send(embed = unbanforbidden)
-        if not logchannel:
-            await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
-        else:
-            try:
-                pass
-            except discord.Forbidden:
-                logforbidden = discord.Embed(
-                    description = "I was unable to log this action because I can't send messages in the designated log channel",
-                    color = 0xf34141
-                )
-                logforbidden.set_author(name = "Error")
-                logforbidden.timestamp = datetime.utcnow()
-                await ctx.send(embed = logforbidden)
-        dm = config["dm_on_unban"]
-        if dm == "true":
-            dmem = discord.Embed(
-                title = ":unlock: Punishent Updated: Unban",
-                description = f"**Reason:** {reason}",
-                color = 0x6dff88
-            )
-            dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
-            dmem.set_author(
-                name = ctx.message.guild,
-                icon_url = ctx.message.guild.icon_url
-            )
-            try:
-                await target.send(embed=dmem)
-            except:
-                return
-        if dm == "false":
-            return
-
-    @commands.command(description="Kicks a user")
-    @commands.guild_only()
-    async def kick(self, ctx, target:discord.User=None, *, reason=None):
-        config = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
-        staffroleid = int(config["staffrole"])
-        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
-        adminroleid = int(config["adminrole"])
-        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
-        if staffrole not in ctx.message.author.roles:
-            if adminrole not in ctx.message.author.roles:
-                missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
-                return await ctx.send(embed=missingperms)
-        logchannelidstr = config["actionlog"]
-        logchannelid = int(logchannelidstr)
-        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
-        casenumber = random.randint(1000000000, 9999999999)
-        log = discord.Embed(
-            description=f"**{target} kicked**", 
-            color=0xff8500
-            )
-        log.add_field(
-            name = "User",
-            value = f"{target.mention} ({target.id})"
-        )
-        log.add_field(
-            name = "Responsible Moderator",
-            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
-        )
-        log.add_field(
-            name = "Reason",
-            value = reason
-        )
-        log.set_footer(text = casenumber)
-        log.timestamp = datetime.utcnow()
-        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/womans-boots_1f462.png")
-        if target == None:
-            invaliduser = discord.Embed(
-                description = "You must provide a valid user to kick",
-                color = 0xf34141
-            )
-            invaliduser.set_author(name = "Error")
-            return await ctx.send(embed = invaliduser)
-        if target == ctx.message.author:
-            return await ctx.send("<:error:696628928458129488> You cannot kick yourself")
-        try:
-            await ctx.guild.kick(target, reason=f"Action by {ctx.message.author} for {reason}")
-            await ctx.send(f":ok_hand: Kicked **{target}** for *{reason}*")
-        except discord.Forbidden:
-            kickforbidden = discord.Embed(
-                description = "I was unable to kick this user. Make sure my highest role is above their's and I have kick members permissions",
-                color = 0xf34141
-            )
-            kickforbidden.set_author(name = "Error")
-            kickforbidden.timestamp = datetime.utcnow()
-            return await ctx.send(embed = kickforbidden)
-        if not logchannel:
-            pass
-        else:
-            try:
-                await logchannel.send(embed=log)
-            except discord.Forbidden:
-                logforbidden = discord.Embed(
-                    description = "I was unable to log this action because I can't send messages in the designated log channel",
-                    color = 0xf34141
-                )
-                logforbidden.set_author(name = "Error")
-                logforbidden.timestamp = datetime.utcnow()
-                await ctx.send(embed = logforbidden)
-        casenumber = random.randint(1000000000, 9999999999)
-        post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Kick","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.utcnow(),"Status":"Active","Guild":ctx.message.guild.id}
-        await self.db.infractions.insert_one(post)
-        dm = config["dm_on_kick"]
-        if dm == "true":
-            dmem = discord.Embed(
-                title = ":boot: Punishent Notification: Kick",
-                description = f"**Reason:** {reason}\n**Case ID:** {casenumber}",
-                color = 0xff8500
-            )
-            dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
-            dmem.set_author(
-                name = ctx.message.guild,
-                icon_url = ctx.message.guild.icon_url
-            )
-            try:
-                await target.send(embed=dmem)
-            except:
-                return
-        if dm == "false":
-            return
-
-    @commands.command(description="Mutes a user")
-    @commands.guild_only()
-    async def mute(self, ctx, target:discord.Member=None, *, reason=None):
-        config = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
-        staffroleid = int(config["staffrole"])
-        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
-        adminroleid = int(config["adminrole"])
-        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
-        if staffrole not in ctx.message.author.roles:
-            if adminrole not in ctx.message.author.roles:
-                missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
-                return await ctx.send(embed=missingperms)
-        logchannelidstr = config["actionlog"]
-        logchannelid = int(logchannelidstr)
-        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
-        muteroleidstr = config["muterole"]
-        muteroleid = int(muteroleidstr)
-        muterole = discord.utils.get(ctx.guild.roles, id=muteroleid)
-        casenumber = random.randint(1000000000, 9999999999)
-        log = discord.Embed(
-            description=f"**{target} muted**", 
-            color=0xff8500
-            )
-        log.add_field(
-            name = "User",
-            value = f"{target.mention} ({target.id})"
-        )
-        log.add_field(
-            name = "Responsible Moderator",
-            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
-        )
-        log.add_field(
-            name = "Reason",
-            value = reason
-        )
-        log.add_field(
-            name = "Mute Duration",
-            value = "Indefinite"
-        )
-        log.set_footer(text = casenumber)
-        log.timestamp = datetime.utcnow()
-        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/speaker-with-cancellation-stroke_1f507.png")
-        if target == None:
-            invaliduser = discord.Embed(
-                description = "You must provide a valid user to mute",
-                color = 0xf34141
-            )
-            invaliduser.set_author(name = "Error")
-            return await ctx.send(embed = invaliduser)
-        if target == ctx.message.author:
-            return await ctx.send("<:error:696628928458129488> You cannot mute yourself")
-        if not muterole:
-            await ctx.send("<:error:696628928458129488> No mute role found, create a role called Muted")
-        else:
-            try:
-                await target.add_roles(muterole, reason=f"User muted by {ctx.message.author} for {reason}")
-                await ctx.send(f":ok_hand: Muted **{target}** for *{reason}*")
-            except discord.Forbidden:
-                muteforbidden = discord.Embed(
-                    description = "I was unable to mute this user. Make sure my highest role is above the mute role and I have manage roles permissions",
-                    color = 0xf34141
-                )
-                muteforbidden.set_author(name = "Error")
-                muteforbidden.timestamp = datetime.utcnow()
-                return await ctx.send(embed = muteforbidden)
-        if not logchannel:
-            await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
-        else:
-            try:
-                await logchannel.send(embed=log)
-            except discord.Forbidden:
-                logforbidden = discord.Embed(
-                    description = "I was unable to log this action because I can't send messages in the designated log channel",
-                    color = 0xf34141
-                )
-                logforbidden.set_author(name = "Error")
-                logforbidden.timestamp = datetime.utcnow()
-                await ctx.send(embed = logforbidden)
-        post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Mute","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.utcnow(),"Status":"Active","Guild":ctx.message.guild.id}
-        await self.db.infractions.insert_one(post)
-        dm = config["dm_on_mute"]
-        if dm == "true":
-            dmem = discord.Embed(
-                title = ":mute: Punishent Notification: Mute",
-                description = f"**Reason:** {reason}\n**Case ID:** {casenumber}",
-                color = 0xff8500
-            )
-            dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
-            dmem.set_author(
-                name = ctx.message.guild,
-                icon_url = ctx.message.guild.icon_url
-            )
-            try:
-                await target.send(embed=dmem)
-            except:
-                return
-        if dm == "false":
-            return
-
-    @commands.command(description="Removes a user's mute")
-    @commands.guild_only()
-    async def unmute(self, ctx, target:discord.Member=None, *, reason=None):
-        config = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
-        staffroleid = int(config["staffrole"])
-        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
-        adminroleid = int(config["adminrole"])
-        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
-        if staffrole not in ctx.message.author.roles:
-            if adminrole not in ctx.message.author.roles:
-                missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
-                return await ctx.send(embed=missingperms)
-        logchannelidstr = config["actionlog"]
-        logchannelid = int(logchannelidstr)
-        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
-        muteroleidstr = config["muterole"]
-        muteroleid = int(muteroleidstr)
-        muterole = discord.utils.get(ctx.guild.roles, id=muteroleid)
-        log = discord.Embed(
-            description=f"**{target} unmuted**", 
-            color=0x6dff88
-            )
-        log.add_field(
-            name = "User",
-            value = f"{target.mention} ({target.id})"
-        )
-        log.add_field(
-            name = "Responsible Moderator",
-            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
-        )
-        log.add_field(
-            name = "Reason",
-            value = reason
-        )
-        log.timestamp = datetime.utcnow()
-        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/speaker-with-three-sound-waves_1f50a.png")
-        if target == None:
-            invaliduser = discord.Embed(
-                description = "You must provide a valid user to unmute",
-                color = 0xf34141
-            )
-            invaliduser.set_author(name = "Error")
-            return await ctx.send(embed = invaliduser)
-        if target == ctx.message.author:
-            return await ctx.send("<:error:696628928458129488> You cannot unmute yourself")
-        if not muterole:
-            await ctx.send("<:error:696628928458129488> No mute role found, create a role called Muted")
-        else:
-            try:
-                await target.remove_roles(muterole, reason=f"User unmuted by {ctx.message.author} for {reason}")
-                await ctx.send(f":ok_hand: Unmuted **{target}** for *{reason}*")
-            except discord.Forbidden:
-                banforbidden = discord.Embed(
-                    description = "I was unable to unmute this user. Make sure my highest role is above the mute role and I have manage roles permissions",
-                    color = 0xf34141
-                )
-                banforbidden.set_author(name = "Error")
-                banforbidden.timestamp = datetime.utcnow()
-                return await ctx.send(embed = banforbidden)
-        if not logchannel:
-            await ctx.send("<:error:696628928458129488> I couldn't log this action, no log channel found")
-        else:
-            try:
-                await logchannel.send(embed=log)
-            except discord.Forbidden:
-                await ctx.send("<:error:696628928458129488> I couldn't log this action because I can't send messages in the log channel")
-        dm = config["dm_on_unmute"]
-        if dm == "true":
-            dmem = discord.Embed(
-                title = ":loud_sound: Punishent Updated: Unmute",
-                description = f"""
-                **Reason:** {reason}
-                """,
-                color = 0x6dff88
-            )
-            dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
-            dmem.set_author(
-                name = ctx.message.guild,
-                icon_url = ctx.message.guild.icon_url
-            )
-            try:
-                await target.send(embed=dmem)
-            except:
-                return
-        if dm == "false":
-            return
-
-    @commands.command(description="Issues a user a warning")
-    @commands.guild_only()
-    async def warn(self, ctx, target:discord.Member=None, *, reason=None):
-        config = await self.db.guildconfigs.find_one({"_id":ctx.message.guild.id})
-        staffroleid = int(config["staffrole"])
-        staffrole = discord.utils.get(ctx.guild.roles, id=staffroleid)
-        adminroleid = int(config["adminrole"])
-        adminrole = discord.utils.get(ctx.guild.roles, id=adminroleid)
-        if staffrole not in ctx.message.author.roles:
-            if adminrole not in ctx.message.author.roles:
-                missingperms = discord.Embed(title="Not so fast", description="You do not have permission to use this command",color=0xff0000)
-                return await ctx.send(embed=missingperms)
-        logchannelidstr = config["actionlog"]
-        logchannelid = int(logchannelidstr)
-        logchannel = discord.utils.get(ctx.guild.text_channels, id=logchannelid)
-        casenumber = random.randint(1000000000, 9999999999)
-        log = discord.Embed(
-            description=f"**{target} warned**", 
-            color=0xfff25f
-            )
-        log.add_field(
-            name = "User",
-            value = f"{target.mention} ({target.id})"
-        )
-        log.add_field(
-            name = "Responsible Moderator",
-            value = f"{ctx.message.author.mention} ({ctx.message.author.id})"
-        )
-        log.add_field(
-            name = "Reason",
-            value = reason
-        )
-        log.set_footer(text = casenumber)
-        log.timestamp = datetime.utcnow()
-        log.set_author(name = "Punishment Log", icon_url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/155/warning-sign_26a0.png")
-        if target == None:
-            invaliduser = discord.Embed(
-                description = "You must provide a valid user to warn",
-                color = 0xf34141
-            )
-            invaliduser.set_author(name = "Error")
-            return await ctx.send(embed = invaliduser)
-        if target == ctx.message.author:
-           return await ctx.send("<:error:696628928458129488> You cannot warn yourself")
-        else:
-            post = {"_id": f"{target.id}{casenumber}", "Case Number":casenumber, "Punishment Type":"Warning","Target":target.id,"Target Name":f"{target}","Mod":ctx.message.author.id,"Mod Name":f"{ctx.message.author}","Reason":f"{reason}","Timestamp":datetime.utcnow(),"Status":"Active","Guild":ctx.message.guild.id}
-            await self.db.infractions.insert_one(post)
-            dm = config["dm_on_warn"]
-            if dm == "true":
-                dmem = discord.Embed(
-                    title = "Punishment Notification",
-                    description = f"You have been warned in *{ctx.message.guild}*.\nReason: {reason}\nPunishment ID: {casenumber}",
-                    color = 0xfff25f
-                )
-                dmem.set_footer(text = f"Guild ID: {ctx.message.guild.id}")
-                dmem.set_author(
-                    name = ctx.message.guild,
-                    icon_url = ctx.message.guild.icon_url
-                )
-                dmem.set_thumbnail(url = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/155/warning-sign_26a0.png")
-                try:
-                    await target.send(embed=dmem)
-                    confirmation = discord.Embed(
-                        description = f"{target} ({target.id}) has been warned\nReason: {reason}",
-                        color = 0x5c92ff
-                    )
-                    confirmation.set_author(name = "Punishment Submitted Successfully")
-                    confirmation.set_footer(text = casenumber)
-                    await ctx.send(embed = confirmation)
-                except:
-                    confirmation = discord.Embed(
-                        description = f"A warning has been added to {target} ({target.id})\nReason: {reason}\nI wasn't able to DM them to notify them of their warning",
-                        color = 0x5c92ff
-                    )
-                    confirmation.set_author(name = "Punishment Submitted Successfully")
-                    confirmation.set_footer(text = casenumber)
-                    await ctx.send(embed = confirmation)
-            if dm == "false":
-                confirmation = discord.Embed(
-                    description = f"{target} ({target.id}) has been warned\nReason: {reason}",
-                    color = 0x5c92ff
-                )
-                confirmation.set_author(name = "Punishment Submitted Successfully")
-                confirmation.set_footer(text = casenumber)
-                await ctx.send(embed = confirmation)
-        try:
-            await logchannel.send(embed=log)
+            target = ctx.guild.get_member(target.id)
         except:
-            await ctx.send(":(")
+            return True
+        if target not in ctx.guild.members:
+            return True
+        if mod.top_role <= target.top_role:
+            return False
+        elif mod.top_role > target.top_role:
+            return True
+
+    async def log_action(self, ctx, verb : str, color, target : discord.User, mod : discord.User, reason : str, icon_url : str, infraction_id : str = None, infraction_type : str = None, duration : str = None):
+        if not self.config.moderation_log:
+            return
+        embed = discord.Embed(description = f"{target} {verb}", color = color)
+        embed.add_field(
+            name = "User",
+            value = f"{target.mention} ({target.id})"
+        )
+        embed.add_field(
+            name = "Moderator",
+            value = f"{mod.mention} ({mod.id})"
+        )
+        embed.add_field(
+            name = "Reason",
+            value = reason
+        )
+        if duration:
+            embed.add_field(
+                name = "Duration",
+                value = duration
+            )
+        embed.set_footer(text = infraction_id)
+        embed.timestamp = datetime.utcnow()
+        embed.set_author(name = "Infraction Log", icon_url = icon_url)
+        try:
+            log_channel = discord.utils.get(ctx.guild.text_channels, id=self.config.moderation_log)
+        except:
+            return await self.functions.handle_error(ctx, "Unable to locate log channel", "Double-check the log channel ID in my config file")
+        try:
+            await log_channel.send(embed = embed)
+        except:
+            return await self.functions.handle_error(ctx, "Unable to log action", "Double-check the log channel ID in my config file and ensure I have send messages permissions in that channel")
+        if not infraction_id:
+            return
+        infraction = {
+            "_id": str(infraction_id),
+            "guild": str(ctx.message.guild.id),
+            "infraction_type": infraction_type,
+            "target": str(target.id),
+            "mod": str(mod.id),
+            "reason": reason,
+            "duration": duration,
+            "status": "active",
+            "timestamp": datetime.utcnow()
+        }
+        await self.db.infractions.insert_one(infraction)
+
+    async def notify_target(self, ctx, infraction_type : str, target : discord.User, reason : str, color : str, guild : discord.Guild, icon_url : str, duration : str = None, infraction_id : str = None):
+        embed = discord.Embed(
+            description = f"Infraction Notification: {infraction_type}",
+            color = color
+        )
+        embed.add_field(
+            name = "Reason",
+            value = reason
+        )
+        embed.set_author(name = ctx.message.guild.name, icon_url = ctx.message.guild.icon_url)
+        if duration:
+            embed.add_field(
+                name = "Duration",
+                value = duration
+            )
+        if infraction_id:
+            embed.add_field(
+                name = "Infraction ID",
+                value = infraction_id
+            )
+        embed.timestamp = datetime.utcnow()
+        try:
+            await target.send(embed = embed)
+            return True
+        except:
+            return False
+
+    @commands.command()
+    @commands.guild_only()
+    async def ban(self, ctx, target: discord.User = None, *, reason = None):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
+        if target == None:
+            return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
+        if target == ctx.message.author:
+            return await self.functions.handle_error(ctx, "You can't ban yourself")
+        superior = await self.check_hierarchy(ctx, ctx.message.author, target)
+        if not superior:
+            return await self.functions.handle_error(ctx, "You don't have permission to ban this user", "Your highest role must be higher than theirs")
+        try:
+            await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
+        except:
+            return await self.functions.handle_error(ctx, "Unable to ban this user", "Make sure my role is above theirs and I have been granted ban members permissions")
+        infraction_id = await self.generate_infraction_id()
+        notified = await self.notify_target(
+            ctx,
+            infraction_type = "Ban",
+            target = target,
+            reason = reason,
+            color = 0xff0000,
+            guild = ctx.message.guild,
+            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            infraction_id = infraction_id
+        )
+        await self.confirm_infraction(
+            ctx,
+            verb = "banned",
+            target = target,
+            notified = notified,
+            infraction_id = infraction_id
+        )
+        await self.log_action(
+            ctx,
+            verb = "banned",
+            color = 0xff0000,
+            target = target,
+            mod = ctx.message.author,
+            reason = reason,
+            duration = "Indefinite",
+            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            infraction_id = infraction_id,
+            infraction_type = "ban"
+        )
+
+    @commands.command()
+    @commands.guild_only()
+    async def tempban(self, ctx, target: discord.User = None, duration = None, *, reason = None):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
+        if target == None:
+            return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
+        if duration == None:
+            return await self.functions.handle_error(ctx, "Invalid duration", "Try 1h, 1d, etc.")
+        if target == ctx.message.author:
+            return await self.functions.handle_error(ctx, "You can't ban yourself")
+        superior = await self.check_hierarchy(ctx, ctx.message.author, target)
+        if not superior:
+            return await self.functions.handle_error(ctx, "You don't have permission to ban this user", "Your highest role must be higher than theirs")
+        duration_pre_parse = duration
+        duration = dateparser.parse(f"in {duration}")
+        if type(duration) != datetime:
+            return await self.functions.handle_error(ctx, "Invalid duration", "Try 1h, 1d, etc.")
+        try:
+            await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
+        except:
+            return await self.functions.handle_error(ctx, "Unable to ban this user", "Make sure my role is above theirs and I have been granted ban members permissions")
+        infraction_id = await self.generate_infraction_id()
+        notified = await self.notify_target(
+            ctx,
+            infraction_type = "Temporary ban",
+            target = target,
+            reason = reason,
+            color = 0xff0000,
+            guild = ctx.message.guild,
+            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            duration = duration_pre_parse,
+            infraction_id = infraction_id
+        )
+        await self.confirm_infraction(
+            ctx,
+            verb = "temporarily banned",
+            target = target,
+            notified = notified,
+            infraction_id = infraction_id
+        )
+        await self.log_action(
+            ctx,
+            verb = "temporarily banned",
+            color = 0xff0000,
+            target = target,
+            mod = ctx.message.author,
+            reason = reason,
+            duration = duration_pre_parse,
+            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            infraction_id = infraction_id,
+            infraction_type = "tempban"
+        )
+        pause.until(duration)
+        target = await self.bot.fetch_user(target.id)
+        await ctx.guild.unban(target, reason = f"Temporary ban {infraction_id} expired")
+        await self.log_action(
+            ctx,
+            verb = "automatically unbanned",
+            color = 0x6dff88,
+            target = target,
+            mod = self.bot.user,
+            reason = f"temporary ban {infraction_id} expired",
+            icon_url = "https://i.postimg.cc/HLp2wpWC/open-lock-1f513.png"
+        )
+
+    @commands.command()
+    @commands.guild_only()
+    async def forceban(self, ctx, target_id = None, *, reason = None):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
+        if target_id == None:
+            return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
+        try:
+            target_id = int(target_id)
+        except:
+            return await self.functions.handle_error(ctx, "Invalid user ID", "Forceban accepts user IDs only")
+        try:
+            target = await self.bot.fetch_user(target_id)
+        except:
+            return await self.functions.handle_error(ctx, "Invalid user", "Make sure you have the right user ID")
+        if target == ctx.message.author:
+            return await self.functions.handle_error(ctx, "You can't ban yourself")
+        superior = await self.check_hierarchy(ctx, ctx.message.author, target)
+        if not superior:
+            return await self.functions.handle_error(ctx, "You don't have permission to ban this user", "Your highest role must be higher than theirs")
+        try:
+            await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
+        except:
+            return await self.functions.handle_error(ctx, "Unable to ban this user", "Make sure my role is above theirs and I have been granted ban members permissions")
+        infraction_id = await self.generate_infraction_id()
+        notified = await self.notify_target(
+            ctx,
+            infraction_type = "Ban",
+            target = target,
+            reason = reason,
+            color = 0xff0000,
+            guild = ctx.message.guild,
+            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            infraction_id = infraction_id
+        )
+        await self.confirm_infraction(
+            ctx,
+            verb = "banned",
+            target = target,
+            notified = notified,
+            infraction_id = infraction_id
+        )
+        await self.log_action(
+            ctx,
+            verb = "banned",
+            color = 0xff0000,
+            target = target,
+            mod = ctx.message.author,
+            reason = reason,
+            duration = "Indefinite",
+            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            infraction_id = infraction_id,
+            infraction_type = "ban"
+        )
+
+    @commands.command()
+    @commands.guild_only()
+    async def unban(self, ctx, target_id = None, *, reason = None):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
+        try:
+            target_id = int(target_id)
+        except:
+            return await self.functions.handle_error(ctx, "Invalid user ID", "Unban accepts user IDs only")
+        try:
+            target = await self.bot.fetch_user(target_id)
+        except:
+            return await self.functions.handle_error(ctx, "Invalid user", "Make sure you have the right user ID")
+        try:
+            await ctx.guild.unban(target, reason = f"Action by {ctx.message.author} for {reason}")
+        except:
+            return await self.functions.handle_error(ctx, "Unable to unban user", "Make sure I have ban members permissions and the user is indeed banned")
+        notified = await self.notify_target(
+            ctx,
+            infraction_type = "Unban",
+            target = target,
+            reason = reason,
+            color = 0x6dff88,
+            guild = ctx.message.guild,
+            icon_url = "https://i.postimg.cc/HLp2wpWC/open-lock-1f513.png",
+        )
+        await self.confirm_infraction(
+            ctx,
+            verb = "unbanned",
+            target = target,
+            notified = notified
+        )
+        await self.log_action(
+            ctx,
+            verb = "unbanned",
+            color = 0x6dff88,
+            target = target,
+            mod = ctx.message.author,
+            reason = reason,
+            icon_url = "https://i.postimg.cc/HLp2wpWC/open-lock-1f513.png"
+        )
+    
+    @commands.command()
+    @commands.guild_only()
+    async def kick(self, ctx, target: discord.User = None, *, reason = None):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
+        if target == None:
+            return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
+        if target == ctx.message.author:
+            return await self.functions.handle_error(ctx, "You can't kick yourself")
+        superior = await self.check_hierarchy(ctx, ctx.message.author, target)
+        if not superior:
+            return await self.functions.handle_error(ctx, "You don't have permission to kick this user", "Your highest role must be higher than theirs")
+        try:
+            await ctx.guild.kick(target, reason=f"Action by {ctx.message.author} for {reason}")        
+        except:
+            return await self.functions.handle_error(ctx, "Unable to kick this user", "Make sure my role is above theirs and I have been granted kick members permissions")
+        infraction_id = await self.generate_infraction_id()
+        notified = await self.notify_target(
+            ctx,
+            infraction_type = "Kick",
+            target = target,
+            reason = reason,
+            color = 0xf34141,
+            guild = ctx.message.guild,
+            icon_url = "https://i.postimg.cc/DyG0gLmq/hiking-boot-1f97e.png",
+            infraction_id = infraction_id
+        )
+        await self.confirm_infraction(
+            ctx,
+            verb = "kicked",
+            target = target,
+            notified = notified,
+            infraction_id = infraction_id
+        )
+        await self.log_action(
+            ctx,
+            verb = "kicked",
+            color = 0xf34141,
+            target = target,
+            mod = ctx.message.author,
+            reason = reason,
+            icon_url = "https://i.postimg.cc/DyG0gLmq/hiking-boot-1f97e.png",
+            infraction_id = infraction_id,
+            infraction_type = "kick"
+        )
+
+    @commands.command()
+    @commands.guild_only()
+    async def mute(self, ctx, target: discord.Member = None, duration = None, *, reason = None):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
+        if target == None:
+            return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
+        if duration == None:
+            return await self.functions.handle_error(ctx, "Invalid duration", "Try 1h, 1d, etc.")
+        if target == ctx.message.author:
+            return await self.functions.handle_error(ctx, "You can't mute yourself")
+        superior = await self.check_hierarchy(ctx, ctx.message.author, target)
+        if not superior:
+            return await self.functions.handle_error(ctx, "You don't have permission to mute this user", "Your highest role must be higher than theirs")
+        duration_pre_parse = duration
+        duration = dateparser.parse(f"in {duration}")
+        if type(duration) != datetime:
+            return await self.functions.handle_error(ctx, "Invalid duration", "Try 1h, 1d, etc.")
+        if not self.config.mute_role:
+            return await self.functions.handle_error(ctx, "No mute role found", "No mute role has been defined in bot config file")
+        try:
+            mute_role = discord.utils.get(ctx.guild.roles, id = self.config.mute_role)
+        except:
+            return await self.functions.handle_error(ctx, "Invalid mute role", "Double check the mute role in the bot config file")
+        try:
+            await target.add_roles(mute_role, reason=f"Action by {ctx.message.author} for {reason}")        
+        except:
+            return await self.functions.handle_error(ctx, "Unable to mute this user", "Make sure my role is above theirs and I have been granted manage roles permissions")
+        infraction_id = await self.generate_infraction_id()
+        notified = await self.notify_target(
+            ctx,
+            infraction_type = "Mute",
+            target = target,
+            reason = reason,
+            color = 0xf34141,
+            guild = ctx.message.guild,
+            icon_url = "https://i.postimg.cc/Tw8fhHqF/speaker-with-cancellation-stroke-1f507.png",
+            duration = duration_pre_parse,
+            infraction_id = infraction_id
+        )
+        await self.confirm_infraction(
+            ctx,
+            verb = "temporarily muted",
+            target = target,
+            notified = notified,
+            infraction_id = infraction_id
+        )
+        await self.log_action(
+            ctx,
+            verb = "muted",
+            color = 0xf34141,
+            target = target,
+            mod = ctx.message.author,
+            reason = reason,
+            duration = duration_pre_parse,
+            icon_url = "https://i.postimg.cc/Tw8fhHqF/speaker-with-cancellation-stroke-1f507.png",
+            infraction_id = infraction_id,
+            infraction_type = "mute"
+        )
+        pause.until(duration)
+        await target.remove_roles(mute_role, reason=f"Temporary mute {infraction_id} expired")        
+        await self.log_action(
+            ctx,
+            verb = "automatically unmuted",
+            color = 0x6dff88,
+            target = target,
+            mod = self.bot.user,
+            reason = f"temporary mute {infraction_id} expired",
+            icon_url = "https://i.postimg.cc/QNyS5GWF/speaker-with-three-sound-waves-1f50a.png"
+        )
+
+    @commands.command()
+    @commands.guild_only()
+    async def unmute(self, ctx, target: discord.Member = None, *, reason = None):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
+        if target == None:
+            return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
+        if target == ctx.message.author:
+            return await self.functions.handle_error(ctx, "You can't unmute yourself")
+        if not self.config.mute_role:
+            return await self.functions.handle_error(ctx, "No mute role found", "No mute role has been defined in bot config file")
+        try:
+            mute_role = discord.utils.get(ctx.guild.roles, id = self.config.mute_role)
+        except:
+            return await self.functions.handle_error(ctx, "Invalid mute role", "Double check the mute role in the bot config file")
+        if mute_role not in target.roles:
+            return await self.functions.handle_error(ctx, "User is not muted")
+        try:
+            await target.remove_roles(mute_role, reason=f"Action by {ctx.message.author} for {reason}")        
+        except:
+            return await self.functions.handle_error(ctx, "Unable to unmute this user", "Make sure my role is above theirs and I have been granted manage roles permissions")
+        notified = await self.notify_target(
+            ctx,
+            infraction_type = "Unmute",
+            target = target,
+            reason = reason,
+            color = 0x6dff88,
+            guild = ctx.message.guild,
+            icon_url = "https://i.postimg.cc/QNyS5GWF/speaker-with-three-sound-waves-1f50a.png",
+        )
+        await self.confirm_infraction(
+            ctx,
+            verb = "unmuted",
+            target = target,
+            notified = notified
+        )
+        await self.log_action(
+            ctx,
+            verb = "unmuted",
+            color = 0x6dff88,
+            target = target,
+            mod = ctx.message.author,
+            reason = reason,
+            icon_url = "https://i.postimg.cc/QNyS5GWF/speaker-with-three-sound-waves-1f50a.png",
+        )
+
+    @commands.command()
+    @commands.guild_only()
+    async def warn(self, ctx, target: discord.User = None, *, reason = None):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
+        if target == None:
+            return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
+        if target == ctx.message.author:
+            return await self.functions.handle_error(ctx, "You can't kick yourself")
+        superior = await self.check_hierarchy(ctx, ctx.message.author, target)
+        if not superior:
+            return await self.functions.handle_error(ctx, "You don't have permission to warn this user", "Your highest role must be higher than theirs")
+        infraction_id = await self.generate_infraction_id()
+        notified = await self.notify_target(
+            ctx,
+            infraction_type = "Warning",
+            target = target,
+            reason = reason,
+            color = 0xfff25f,
+            guild = ctx.message.guild,
+            icon_url = "https://i.postimg.cc/hjvHg481/warning-sign-26a0.png",
+            infraction_id = infraction_id
+        )
+        await self.confirm_infraction(
+            ctx,
+            verb = "warned",
+            target = target,
+            notified = notified,
+            infraction_id = infraction_id
+        )
+        await self.log_action(
+            ctx,
+            verb = "warned",
+            color = 0xfff25f,
+            target = target,
+            mod = ctx.message.author,
+            reason = reason,
+            icon_url = "https://i.postimg.cc/hjvHg481/warning-sign-26a0.png",
+            infraction_id = infraction_id,
+            infraction_type = "warning"
+        )
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
+
