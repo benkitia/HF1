@@ -11,69 +11,74 @@ class Utilities(commands.Cog):
 		self.db = bot.db
 		self.functions = bot.functions
 
+	@commands.command(description="Creates a poll")
+	async def poll(self, ctx):
+		await ctx.message.add_reaction('<:upvote:711293005583220807>')
+		await ctx.message.add_reaction('<:downvote:711293020993093743>')
+
 	@commands.command(aliases = ['purge', 'purgeall'])
-    async def clear(self, ctx, amount=10):
+	async def clear(self, ctx, amount=10):
 		staff = await self.functions.check_if_staff(ctx, ctx.message.author)
-        if not staff:
-            return
-        if amount > 300:
-            return await self.functions.handle_error(ctx, "You can only purge up to 300 messages at a time")
-        try:
-            await ctx.channel.purge(limit = amount+1)
-        except discord.Forbidden:
-            return await self.functions.handle_error(ctx, "Unable to purge messages", "Make sure I have permission to manage messages in this channnel")
-        except discord.HTTPException:
-            return await self.functions.handle_error(ctx, "Unable to purge messages", "An unknown Dicord error occured. Try again later.")
+		if not staff:
+			return
+		if amount > 300:
+			return await self.functions.handle_error(ctx, "You can only purge up to 300 messages at a time")
+		try:
+			await ctx.channel.purge(limit = amount+1)
+		except discord.Forbidden:
+			return await self.functions.handle_error(ctx, "Unable to purge messages", "Make sure I have permission to manage messages in this channnel")
+		except discord.HTTPException:
+			return await self.functions.handle_error(ctx, "Unable to purge messages", "An unknown Dicord error occured. Try again later.")
 
 	@commands.command(description="Returns information about a user", aliases=['profile', 'info'])
-    async def userinfo(self, ctx, user_id):
-        try: 
-            user = await self.bot.fetch_user(int(user_id))
-        except:
-            await self.functions.handle_error(ctx, "Invalid user", "This command only accepts user IDs")
-        if ctx.guild.get_member(user.id) is not None:
-            user = ctx.guild.get_member(user.id)
-            in_guild = True
-        else:
-            in_guild = False
-        infraction_count = await self.db.infractions.count_documents({"target": str(user.id), "guild": str(ctx.message.guild.id), "status": "active"})
-        embed = discord.Embed(
-            title = str(user),
-            color = user.color
-        )
-        embed.add_field(
-            name = "Name",
-            value = user.name,
-        )
-        embed.add_field(
-            name = "ID",
-            value = user.id
-        )
-        if in_guild:
-            embed.add_field(
-                name = "Status",
-                value = user.status
-            )
-            embed.add_field(
-                name = "Joined at",
-                value = user.joined_at
-            )
-        embed.add_field(
-            name = "Created at",
-            value = user.created_at
-        )
-        if in_guild:
-            embed.add_field(
-                name = "Highest Role",
-                value = user.top_role
-            )
-        embed.add_field(
-            name = "Infractions",
-            value = infraction_count
-        )
-        embed.set_thumbnail(url = user.avatar_url)
-        embed.set_footer(text = f"Requested by {ctx.message.author}")
-        await ctx.send(embed = embed)
+	async def userinfo(self, ctx, user_id):
+		try: 
+			user = await self.bot.fetch_user(int(user_id))
+		except:
+			await self.functions.handle_error(ctx, "Invalid user", "This command only accepts user IDs")
+		if ctx.guild.get_member(user.id) is not None:
+			user = ctx.guild.get_member(user.id)
+			in_guild = True
+		else:
+			in_guild = False
+		infraction_count = await self.db.infractions.count_documents({"target": str(user.id), "guild": str(ctx.message.guild.id), "status": "active"})
+		embed = discord.Embed(
+			title = str(user),
+			color = user.color
+		)
+		embed.add_field(
+			name = "Name",
+			value = user.name,
+		)
+		embed.add_field(
+			name = "ID",
+			value = user.id
+		)
+		if in_guild:
+			embed.add_field(
+				name = "Status",
+				value = user.status
+			)
+			embed.add_field(
+				name = "Joined at",
+				value = user.joined_at
+			)
+		embed.add_field(
+			name = "Created at",
+			value = user.created_at
+		)
+		if in_guild:
+			embed.add_field(
+				name = "Highest Role",
+				value = user.top_role
+			)
+		embed.add_field(
+			name = "Infractions",
+			value = infraction_count
+		)
+		embed.set_thumbnail(url = user.avatar_url)
+		embed.set_footer(text = f"Requested by {ctx.message.author}")
+		await ctx.send(embed = embed)
 
 	@commands.command(description =" Returns bot response time")
 	async def ping(self, ctx):
@@ -187,6 +192,27 @@ class Utilities(commands.Cog):
 			value = len(set(self.bot.get_all_members()))
 			)
 		await ctx.send(embed = embed)
+
+	@commands.command(description="Add or removes a role")
+	async def role(self, ctx, add_or_remove, target: discord.Member, role: discord.Role):
+		staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+		if not staff:
+			return
+		if add_or_remove == "add":
+			try:
+				await target.add_roles(role)
+			except discord.Forbidden:
+				return await self.functions.handle_error(ctx, "Unable to assign role", "Make sure my highest role is above it and I have manage roles permissions")
+			await self.functions.confirm_action(ctx, f"Added role {role.name} to {target.mention}")
+		if add_or_remove == "remove":
+			try:
+				await target.remove_roles(role)
+			except discord.Forbidden:
+				return await self.functions.handle_error(ctx, "Unable to remove role", "Make sure my highest role is above it and I have manage roles permissions")
+			await self.functions.confirm_action(ctx, f"Removed role {role.name} from {target.mention}")
+		if add_or_remove != "add":
+			if add_or_remove != "remove":
+				return await self.functions.handle_error(ctx, "Specify add or remove")
 
 def setup(bot):
 	bot.add_cog(Utilities(bot))

@@ -23,11 +23,11 @@ MONGO_URI = os.environ.get("MONGO_URI", "mongodb://127.0.0.1")
 cogs = ['cogs.admin']
 
 
-class WaffleBot(commands.Bot):
+class HF1(commands.Bot):
 
     def __init__(self):
         super().__init__(
-            command_prefix='-',
+            command_prefix='!!',
             description="A simple yet powerful moderation bot. Written in discord.py",
             intents=intents
         )
@@ -53,7 +53,7 @@ class WaffleBot(commands.Bot):
     async def init_mongo(self) -> None:
         self.mongo = AsyncIOMotorClient(MONGO_URI)
         await self.mongo.admin.command("ismaster")
-        self.db = self.mongo.wafflebot
+        self.db = self.mongo.HF1
         print("Connected to mongo")
         print("______________")
 
@@ -65,7 +65,7 @@ class WaffleBot(commands.Bot):
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    bot = WaffleBot()
+    bot = HF1()
 
     loop.run_until_complete(bot.init_http())
 
