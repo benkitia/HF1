@@ -502,7 +502,7 @@ class Moderation(commands.Cog):
             icon_url = "https://i.postimg.cc/QNyS5GWF/speaker-with-three-sound-waves-1f50a.png",
         )
 
-    @commands.command()
+    @commands.command(aliases=['strike'])
     @commands.guild_only()
     async def warn(self, ctx, target: discord.User = None, *, reason = None):
         staff = await self.functions.check_if_staff(ctx, ctx.message.author)
