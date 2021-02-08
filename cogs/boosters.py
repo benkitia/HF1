@@ -203,9 +203,9 @@ class Boosters(commands.Cog):
             greenrole = discord.utils.get(before.guild.roles, id=737709682856034375)
             bluerole = discord.utils.get(before.guild.roles, id=737709713881301012)
             colorroles = [redrole,orangerole,yellowrole,greenrole,bluerole]
-        for colorrole in colorroles:
-            if colorrole in after.roles:
-                await before.remove_roles(colorrole, reason=f"Auto nitro color removal - boost expired")
+            for colorrole in colorroles:
+                if colorrole in after.roles:
+                    await before.remove_roles(colorrole, reason=f"Auto nitro color removal - boost expired")
 
 def setup(bot):
     bot.add_cog(Boosters(bot))
