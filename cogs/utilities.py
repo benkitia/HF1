@@ -31,7 +31,9 @@ class Utilities(commands.Cog):
 			return await self.functions.handle_error(ctx, "Unable to purge messages", "An unknown Dicord error occured. Try again later.")
 
 	@commands.command(description="Returns information about a user", aliases=['profile', 'info'])
-	async def userinfo(self, ctx, user_id = ctx.message.author.id):
+	async def userinfo(self, ctx, user_id = None):
+		if user_id == None:
+			user_id = ctx.message.author.id
 		try: 
 			user = await self.bot.fetch_user(int(user_id))
 		except:
