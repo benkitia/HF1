@@ -443,7 +443,8 @@ class Moderation(commands.Cog):
             infraction_id = infraction_id,
             infraction_type = "mute"
         )
-        pause.until(duration)
+        while dateparser.parse("in 1s") < duration:
+            await asyncio.sleep(1)
         await target.remove_roles(mute_role, reason=f"Temporary mute {infraction_id} expired")        
         await self.log_action(
             ctx,
