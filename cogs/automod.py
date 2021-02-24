@@ -16,11 +16,11 @@ class Automod(commands.Cog):
             return
         if not self.config.auto_dehoist:
             return
-        hoist_charectars = ['!', '@', '#', '$', '%', '^', '&', '*',
+        hoist_ characters = ['!', '@', '#', '$', '%', '^', '&', '*',
                             '(', ')', '-', '_', '+', '=', '[', ']', ':', ';', '"', "'", '<', ',', '>', '.', '?', '?', '`']
-        for hoist_charectar in hoist_charectars:
-            if after.nick.startswith(hoist_charectar):
-                await before.edit(nick="I need a new nickname", reason="Auto dehoist")
+        for hoist_ character in hoist_ characters:
+            if after.nick.startswith(hoist_ character):
+                await before.edit(nick = "I need a new nickname", reason = "Auto dehoist")
 
 def setup(bot):
     bot.add_cog(Automod(bot))

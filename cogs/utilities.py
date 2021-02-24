@@ -9,7 +9,7 @@ class Utilities(commands.Cog):
 		self.db = bot.db
 		self.functions = bot.functions
 
-	@commands.command(description="Creates a poll")
+	@commands.command(description = "Creates a poll")
 	async def poll(self, ctx):
 		await ctx.message.add_reaction('<:upvote:711293005583220807>')
 		await ctx.message.add_reaction('<:downvote:711293020993093743>')
@@ -28,7 +28,7 @@ class Utilities(commands.Cog):
 		except discord.HTTPException:
 			return await self.functions.handle_error(ctx, "Unable to purge messages", "An unknown Dicord error occured. Try again later.")
 
-	@commands.command(description="Returns information about a user", aliases=['profile', 'info'])
+	@commands.command(description = "Returns information about a user", aliases = ['profile', 'info'])
 	async def userinfo(self, ctx, user_id = None):
 		if user_id == None:
 			user_id = ctx.message.author.id
@@ -105,14 +105,14 @@ class Utilities(commands.Cog):
 		embed.set_image(url = avi)
 		await ctx.send(embed = embed)
 
-	@commands.command(description="Returns an enlarged version of an emoji. This does not work on default Discord emojis.", aliases=['jumbo', 'bigify'])
+	@commands.command(description = "Returns an enlarged version of an emoji. This does not work on default Discord emojis.", aliases = ['jumbo', 'bigify'])
 	async def enlarge(self, ctx, emoji: discord.Emoji):
 		try:
 			await ctx.send(emoji.url)
 		except:
 			await self.functions.handle_error(ctx, "This command only works with server emojis")
 
-	@commands.command(description="Returns information about a server", aliases=['server'])
+	@commands.command(description = "Returns information about a server", aliases = ['server'])
 	async def serverinfo(self, ctx, guild_id : int = None):
 		if not guild_id:
 			guild = ctx.message.guild
@@ -193,7 +193,7 @@ class Utilities(commands.Cog):
 			)
 		await ctx.send(embed = embed)
 
-	@commands.command(description="Add or removes a role")
+	@commands.command(description = "Add or removes a role")
 	async def role(self, ctx, add_or_remove, target: discord.Member, role: discord.Role):
 		staff = await self.functions.check_if_staff(ctx, ctx.message.author)
 		if not staff:
