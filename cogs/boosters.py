@@ -57,14 +57,13 @@ class Boosters(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, before:discord.Member, after:discord.Member):
-        ctx: commands.Context = await self.bot.get_context(before)
-        booster_role = discord.utils.get(ctx.guild.roles, id = 588162647568941074)
+        booster_role = discord.utils.get(before.roles, id = 588162647568941074)
         if booster_role not in before.roles:
             return
         if before.roles == after.roles:
             return
         if booster_role not in after.roles:
-            await self.remove_all_color_roles(ctx, ctx.message.author, "Automatic color role removal")
+            await self.remove_all_color_roles(before, ctx.message.author, "Automatic color role removal")
 
 def setup(bot):
     bot.add_cog(Boosters(bot))
