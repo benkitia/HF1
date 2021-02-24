@@ -42,7 +42,7 @@ class HF1(commands.Bot):
     async def on_ready(self):
         print(f"{self.user.name} ({self.user.id}) is online")
         print("______________")
-        pstatus = f"eating breakfast"
+        pstatus = f"github.com/iphonediscord/hf1"
         await self.change_presence(activity=discord.Game(name=pstatus), status=discord.Status.online)
         print(f'\n Bot presence set to "{pstatus}"')
         print("______________")
