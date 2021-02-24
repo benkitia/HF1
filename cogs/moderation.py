@@ -3,7 +3,6 @@ import discord
 from discord.ext import commands
 import random
 import string
-from datetime import datetime, date, time
 import dateparser
 import time
 
