@@ -44,10 +44,10 @@ class HF1(commands.Bot):
 		print(f'\n Bot presence set to "{pstatus}"')
 		print("______________")
 		print("Loading extensions...")
-+       for cog in cogs:
-+           self.load_extension(cog)
-+       print("Loaded extensions")
-+       print("______________")
+      	for cog in cogs:
+      		self.load_extension(cog)
+       	print("Loaded extensions")
+       	print("______________")
 
 	async def init_http(self):
 		self.session = ClientSession()
