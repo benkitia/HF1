@@ -1,9 +1,6 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
-from datetime import datetime, date, time
-import time
-from discord.ext.commands.cooldowns import BucketType
 
 class Boosters(commands.Cog):
     
