@@ -3,8 +3,6 @@ from discord.ext import commands
 import random
 import string
 from datetime import datetime, date, time
-import time
-import pause
 import dateparser
 
 class Moderation(commands.Cog):

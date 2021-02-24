@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands import UserConverter
 import pymongo
-
 
 class Utilities(commands.Cog):
 
