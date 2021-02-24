@@ -1,6 +1,8 @@
+from datetime import datetime, date, time
+from datetime import datetime, date, time
 import discord
 from discord.ext import commands
-from datetime import datetime, date, time
+import time
 
 class Logging(commands.Cog):
 
