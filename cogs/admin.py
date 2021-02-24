@@ -7,7 +7,7 @@ class Admin(commands.Cog):
         self.bot = bot
         self.functions = bot.functions
 
-    @commands.command(hidden=True)
+    @commands.command(hidden = True)
     @commands.is_owner()
     async def load(self, ctx, *, module):
         try:
@@ -17,7 +17,7 @@ class Admin(commands.Cog):
         else:
             await self.functions.confirm_action(ctx, f"Loaded extension: {module}")
 
-    @commands.command(hidden=True)
+    @commands.command(hidden = True)
     @commands.is_owner()
     async def unload(self, ctx, *, module):
         try:
@@ -37,24 +37,24 @@ class Admin(commands.Cog):
         else:
             await self.functions.confirm_action(ctx, f"Reload extension: {module}")
 
-    @commands.command(hidden=True)
+    @commands.command(hidden = True)
     @commands.is_owner()
     async def say(self, ctx, *, content):
         await ctx.send(f"{content}")
         await ctx.message.delete()
 
-    @commands.command(hidden=True)
+    @commands.command(hidden = True)
     async def setpresence(self, ctx, activity_type: int, *, presence: str):
-        await self.bot.change_presence(activity=discord.Activity(name=presence, type=activity_type))
+        await self.bot.change_presence(activity = discord.Activity(name = presence, type = activity_type))
         await self.functions.confirm_action(ctx, f"Set presence to {presence}")
 
-    @commands.command(aliases=['logout'], hidden=True)
+    @commands.command(aliases = ['logout'], hidden = True)
     @commands.is_owner()
     async def close(self, ctx):
         await self.functions.confirm_action(ctx, "Logging out...")
         await self.bot.close()
 
-    @commands.command(hidden=True)
+    @commands.command(hidden = True)
     @commands.is_owner()
     async def sudo(self, ctx, user: discord.Member, *, command):
         new_msg = ctx.message
