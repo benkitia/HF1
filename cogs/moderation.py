@@ -224,7 +224,8 @@ class Moderation(commands.Cog):
             infraction_id = infraction_id,
             infraction_type = "tempban"
         )
-        pause.until(duration)
+        while dateparser.parse("in 1s") < duration:
+            await asyncio.sleep(1)
         target = await self.bot.fetch_user(target.id)
         await ctx.guild.unban(target, reason = f"Temporary ban {infraction_id} expired")
         await self.log_action(
