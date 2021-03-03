@@ -20,7 +20,7 @@ DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")
 
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb://127.0.0.1")
 
-cogs = ['cogs.admin','cogs.automod','cogs.boosters','cogs.errhandle','cogs.infractions','cogs.logging','cogs.moderation','cogs.utilities']
+cogs = ['cogs.admin','cogs.automod','cogs.boosters','cogs.errhandle','cogs.infractions','cogs.logging','cogs.moderation','cogs.utilities','cogs.support']
 
 
 class HF1(commands.Bot):
