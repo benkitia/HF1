@@ -10,7 +10,7 @@ class Support(commands.Cog):
 
         @commands.command(description="Describes the two main flaws with the iPhone 7", aliases=['iphone 7', 'iPhone7', 'iPhone 7'])
         async def iphone7(ctx):
-            ctx.send("The iPhone 7 and iPhone 7+ are some of the most problematic iPhones. Here are the two main "
+            await ctx.send("The iPhone 7 and iPhone 7+ are some of the most problematic iPhones. Here are the two main "
                      "issues: \n \n **1) No Service Issue**, which you can read about here: "
                      "https://support.apple.com/iphone-7-no-service. This recall **has expired**, forcing thousands "
                      "of users to pay for their own repair. \n \n **2) Audio IC Issue**, which was caused by the poor "
@@ -22,13 +22,13 @@ class Support(commands.Cog):
 
         @commands.command(description="Asks people to ask their question rather than saying 'Can someone help me?' or similar")
         async def ask(ctx):
-            ctx.send("Please just ask your question. Don't ask to ask. Don't say 'I have a problem'. Please be "
+            await ctx.send("Please just ask your question. Don't ask to ask. Don't say 'I have a problem'. Please be "
                      "specific so that the people who have a solution can and will provide it. "
                      "https://dontasktoask.com/")
 
         @commands.command(description="Provides a guide for cleaning AirPods (not AirPods Pro or AirPods Max)", aliases=["airpods cleaning"])
         async def airpodscleaning(ctx):
-            ctx.send("The best way to clean your AirPods is with an old fine bristle toothbrush, a can of compressed "
+            await ctx.send("The best way to clean your AirPods is with an old fine bristle toothbrush, a can of compressed "
                      "air, hydrogen peroxide, isopropyl alcohol, and a q tip. Here is what you do: \n \n - Soak the q "
                      "tip in a bit of hydrogen peroxide \n - Rub it on the large opening that faces your ear and "
                      "smaller one as well if it's clogged. Be careful not to put too much because you don't want to "
@@ -43,7 +43,7 @@ class Support(commands.Cog):
 
         @commands.command(desciption="Links to a list of all MFI certified accessories")
         async def mfi(ctx):
-            ctx.send("https://mfi.apple.com/account/accessory-search")
+            await ctx.send("https://mfi.apple.com/account/accessory-search")
 
 def setup(bot):
-	bot.add_cog(Support(bot))
+    bot.add_cog(Support(bot))
