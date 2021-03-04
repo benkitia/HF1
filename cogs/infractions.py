@@ -167,6 +167,22 @@ class Utilities(commands.Cog):
         embed.set_thumbnail(url = user.avatar_url)
         await ctx.send(embed = embed)
 
+    @commands.command(description = "Sets the reason of an infraction", aliases = ['reason'])
+    async def infreason(self, ctx, infraction_id, *, reason):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
+        if len(infraction_id) != 12:
+            return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction IDs are 12 characters")
+        infraction = await self.db.infractions.find_one({"_id": infraction_id, "guild": str(ctx.message.guild.id)})
+        if not infraction:
+            return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction not found")
+        try:
+            await self.db.infractions.update_one({"_id": infraction_id, "guild": str(ctx.message.guild.id)}, {"$set": {"reason": reason}})
+        except:
+            return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction not found")
+        await self.functions.confirm_action(ctx, "Infraction reason updated")
+
     @commands.command(description = "Removes an infraction from a user", aliases = ['rmpunish','delinf'])
     async def delinfraction(self, ctx, infraction_id):
         staff = await self.functions.check_if_staff(ctx, ctx.message.author)
