@@ -1,8 +1,9 @@
 import datetime
-# from datetime import datetime, date, time
 import discord
 from discord.ext import commands
 import time
+import random
+import os
 
 class Logging(commands.Cog):
 
@@ -193,6 +194,32 @@ class Logging(commands.Cog):
         embed.timestamp = datetime.datetime.utcnow()
         await channel.send(embed = embed)
 
+    @commands.Cog.listener()
+    async def on_bulk_message_delete(self, messages):
+        if not self.config.message_delete_log:
+            return
+        ctx: commands.Context = await self.bot.get_context(messages[0])
+        try:
+            channel = discord.utils.get(ctx.guild.text_channels, id = self.config.message_delete_log)
+        except:
+            print(f"Unable to log deletion of message {ctx.message.id} because the provided message_delete_log channel ID was invalid.\n__________")
+        log_id = str(random.randint(1000000000, 9999999999))
+        log = open(f"temp/bulk_message_delete_log_{log_id}.txt","w")
+        for message in messages:
+            if not ctx.message.content:
+                message_content = "[No Content]"
+            else:
+                message_content = ctx.message.content
+            message_author = f"{message.author} ({message.author.id})"
+            log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message.content}")
+        log.close()
+        embed = discord.Embed(
+            description = f"{len(messages)} message(s) were deleted in bulk from {messages[0].channel.mention}.\nView them in the attached file",
+            color = 0xb14c00
+        )
+        file = discord.File(log.name)
+        await channel.send(embed = embed, file = file)
+        os.remove(log.name)
 
 def setup(bot):
     bot.add_cog(Logging(bot))
