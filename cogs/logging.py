@@ -1,9 +1,9 @@
 import datetime
 import discord
 from discord.ext import commands
-import time
-import random
 import os
+import random
+import time
 
 class Logging(commands.Cog):
 
