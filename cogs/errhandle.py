@@ -1,5 +1,5 @@
 import discord
-
+from discord.ext import commands
 class Errhandle(commands.Cog):
 
     def __init__(self, bot):
