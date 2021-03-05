@@ -135,6 +135,11 @@ class Moderation(commands.Cog):
         superior = await self.check_hierarchy(ctx, ctx.message.author, target)
         if not superior:
             return await self.functions.handle_error(ctx, "You don't have permission to ban this user", "Your highest role must be higher than theirs")
+        try:
+            await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
+        except:
+            return await self.functions.handle_error(ctx, "Unable to ban this user", "Make sure my role is above theirs and I have been granted ban members permissions")
+        infraction_id = await self.generate_infraction_id()
         notified = await self.notify_target(
             ctx,
             infraction_type = "Ban",
@@ -145,11 +150,6 @@ class Moderation(commands.Cog):
             icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
             infraction_id = infraction_id
         )
-        try:
-            await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
-        except:
-            return await self.functions.handle_error(ctx, "Unable to ban this user", "Make sure my role is above theirs and I have been granted ban members permissions")
-        infraction_id = await self.generate_infraction_id()
         await self.confirm_infraction(
             ctx,
             verb = "banned",
@@ -189,6 +189,11 @@ class Moderation(commands.Cog):
         duration = dateparser.parse(f"in {duration}")
         if type(duration) != datetime:
             return await self.functions.handle_error(ctx, "Invalid duration", "Try 1h, 1d, etc.")
+        try:
+            await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
+        except:
+            return await self.functions.handle_error(ctx, "Unable to ban this user", "Make sure my role is above theirs and I have been granted ban members permissions")
+        infraction_id = await self.generate_infraction_id()
         notified = await self.notify_target(
             ctx,
             infraction_type = "Temporary ban",
@@ -200,11 +205,6 @@ class Moderation(commands.Cog):
             duration = duration_pre_parse,
             infraction_id = infraction_id
         )
-        try:
-            await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
-        except:
-            return await self.functions.handle_error(ctx, "Unable to ban this user", "Make sure my role is above theirs and I have been granted ban members permissions")
-        infraction_id = await self.generate_infraction_id()
         await self.confirm_infraction(
             ctx,
             verb = "temporarily banned",
@@ -259,6 +259,11 @@ class Moderation(commands.Cog):
         superior = await self.check_hierarchy(ctx, ctx.message.author, target)
         if not superior:
             return await self.functions.handle_error(ctx, "You don't have permission to ban this user", "Your highest role must be higher than theirs")
+        try:
+            await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
+        except:
+            return await self.functions.handle_error(ctx, "Unable to ban this user", "Make sure my role is above theirs and I have been granted ban members permissions")
+        infraction_id = await self.generate_infraction_id()
         notified = await self.notify_target(
             ctx,
             infraction_type = "Ban",
@@ -269,11 +274,6 @@ class Moderation(commands.Cog):
             icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
             infraction_id = infraction_id
         )
-        try:
-            await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
-        except:
-            return await self.functions.handle_error(ctx, "Unable to ban this user", "Make sure my role is above theirs and I have been granted ban members permissions")
-        infraction_id = await self.generate_infraction_id()
         await self.confirm_infraction(
             ctx,
             verb = "banned",
