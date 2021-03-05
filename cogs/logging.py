@@ -118,8 +118,12 @@ class Logging(commands.Cog):
             print(f"Unable to log user {member.id} joining because the provided user_join_log channel ID was invalid.\n__________")
         account_created = str((datetime.datetime.utcfromtimestamp(time.time()) - member.created_at))
         account_created = account_created.split(',')[0]
+        if "days" in account_created.lower():
+            account_created = f"{account_created} ago"
+        else:
+            account_created = "today :warning:"
         embed = discord.Embed(
-            description = f"{member.mention} joined the server\nAccount created {account_created} ago", 
+            description = f"{member.mention} joined the server\nAccount created {account_created}", 
             color = 0x298000
             )
         embed.set_thumbnail(url = member.avatar_url)
@@ -144,8 +148,12 @@ class Logging(commands.Cog):
             print(f"Unable to log user {member.id} leaving because the provided user_leave_log channel ID was invalid.\n__________")
         joined = str((datetime.datetime.utcfromtimestamp(time.time()) - member.joined_at))
         joined = joined.split(',')[0]
+        if "days" in joined.lower():
+            joined = f"{joined} ago"
+        else:
+            joined = "today"
         embed = discord.Embed(
-            description = f"{member.mention} left the server\nJoined {joined} ago", 
+            description = f"{member.mention} left the server\nJoined {joined}", 
             color = 0xFF7FFF
             )
         embed.set_thumbnail(url = member.avatar_url)
