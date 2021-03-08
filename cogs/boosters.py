@@ -14,7 +14,8 @@ class Boosters(commands.Cog):
         yellow = discord.utils.get(ctx.guild.roles, id = 737709652820754523)
         green = discord.utils.get(ctx.guild.roles, id = 737709682856034375)
         blue = discord.utils.get(ctx.guild.roles, id = 737709713881301012)
-        color_roles = [red, orange, yellow, green, blue]
+        purple = discord.utils.get(ctx.guild.roles, id = 760327521148600340)
+        color_roles = [red, orange, yellow, green, blue, purple]
         try:
             for color_role in color_roles:
                 if color_role in user.roles:
@@ -30,7 +31,7 @@ class Boosters(commands.Cog):
         accepted_colors = ['red','orange','yellow','green','blue','remove']
         color = color.lower()
         if color not in accepted_colors:
-            await self.functions.handle_error(ctx, "Invalid color", "Valid colors include red, orange, yellow, green, and blue. If you want to remove all color roles, use !color remove")
+            await self.functions.handle_error(ctx, "Invalid color", "Valid colors include red, orange, yellow, green, blue, and purple. If you want to remove all color roles, use !color remove")
         if color == "remove":
             await self.remove_all_color_roles(ctx, ctx.message.author, "Manual color role removal")
             return await self.functions.confirm_action(ctx, "Any color roles assigned to you have been removed")
@@ -44,6 +45,8 @@ class Boosters(commands.Cog):
             color = discord.utils.get(ctx.guild.roles, id = 737709682856034375)
         elif color == "blue":
             color = discord.utils.get(ctx.guild.roles, id = 737709713881301012)
+        elif color == "purple":
+            color = discord.utils.get(ctx.guild.coles, id = 760327521148600340)
         if color in ctx.message.author.roles:
             return await self.functions.handle_error(ctx, "You already have this color role")
         await self.remove_all_color_roles(ctx, ctx.message.author)
