@@ -296,6 +296,91 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    async def multiban(self, ctx, *, args):
+        staff = await self.functions.check_if_staff(ctx, ctx.message.author)
+        if not staff:
+            return
+        arguments = args.split()
+        targets = []
+        not_bans = []
+        reason = ""
+        async with ctx.typing():
+            for argument in arguments:
+                try:
+                    target = await commands.UserConverter().convert(ctx, argument)
+                    targets.append(target)
+                except:
+                    try:
+                        argument = int(argument)
+                        if len(argument) < 20:
+                            not_bans.append(f"{argument} - Invalid UID")
+                        continue
+                    except:
+                        argument = str(argument)
+                        reason_start = arguments.index(argument)
+                        reason = ' '.join(arguments[reason_start::])
+                        break
+            if not targets:
+                return await self.functions.handle_error(ctx, "No users found")
+            if len(targets) > 15:
+                await self.functions.handle_error(ctx, "You can't ban more than 15 users at once")
+            bans = []
+            done = []
+            for target in targets:
+                if target in done:
+                    continue
+                superior = await self.check_hierarchy(ctx, ctx.message.author, target)
+                if not superior:
+                    not_bans.append(f"{target.mention} ({target.id}) - User has role >= you")
+                    continue
+                try:
+                    await ctx.guild.ban(target)
+                except:
+                    not_bans.append(f"{target.mention} ({target.id}) - Ban failed")
+                    continue
+                infraction_id = await self.generate_infraction_id()
+                bans.append(f"{target.mention} ({target.id}) - {infraction_id}")
+                done.append(target)
+                if not reason:
+                    reason = "None"
+                await self.notify_target(
+                    ctx,
+                    infraction_type = "Ban",
+                    target = target,
+                    reason = reason,
+                    color = 0xff0000,
+                    guild = ctx.message.guild,
+                    icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+                    infraction_id = infraction_id
+                )
+                await self.log_action(
+                    ctx,
+                    verb = "banned",
+                    color = 0xff0000,
+                    target = target,
+                    mod = ctx.message.author,
+                    reason = reason,
+                    duration = "Indefinite",
+                    icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+                    infraction_id = infraction_id,
+                    infraction_type = "ban"
+                )
+        embed = discord.Embed(color = 0x43e286)
+        embed.set_author(name = "Multiban")
+        if bans:
+            ban_list = ""
+            for ban in bans:
+                ban_list = f"{ban_list}\n{ban}"
+            embed.add_field(name = "Successfully Banned", value = ban_list, inline = False)
+        if not_bans:
+            not_ban_list = ""
+            for not_ban in not_bans:
+                not_ban_list = f"{not_ban_list}\n{not_ban}"
+            embed.add_field(name = "Unable to Ban", value = not_ban_list, inline = False)
+        await ctx.send(embed = embed)
+
+    @commands.command()
+    @commands.guild_only()
     async def unban(self, ctx, target_id = None, *, reason = None):
         staff = await self.functions.check_if_staff(ctx, ctx.message.author)
         if not staff:
