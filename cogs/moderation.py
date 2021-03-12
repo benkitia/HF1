@@ -333,16 +333,16 @@ class Moderation(commands.Cog):
                 if not superior:
                     not_bans.append(f"{target.mention} ({target.id}) - User has role >= you")
                     continue
+                if not reason:
+                    reason = "None"
                 try:
-                    await ctx.guild.ban(target)
+                    await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")
                 except:
                     not_bans.append(f"{target.mention} ({target.id}) - Ban failed")
                     continue
                 infraction_id = await self.generate_infraction_id()
                 bans.append(f"{target.mention} ({target.id}) - {infraction_id}")
                 done.append(target)
-                if not reason:
-                    reason = "None"
                 await self.notify_target(
                     ctx,
                     infraction_type = "Ban",
