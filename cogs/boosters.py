@@ -28,7 +28,7 @@ class Boosters(commands.Cog):
         booster_role = discord.utils.get(ctx.guild.roles, id = 588162647568941074)
         if booster_role not in ctx.message.author.roles:
             return await self.functions.handle_error(ctx, "This command is for Nitro boosters only")
-        accepted_colors = ['red','orange','yellow','green','blue','remove']
+        accepted_colors = ['red','orange','yellow','green','blue','purple','remove']
         color = color.lower()
         if color not in accepted_colors:
             await self.functions.handle_error(ctx, "Invalid color", "Valid colors include red, orange, yellow, green, blue, and purple. If you want to remove all color roles, use !color remove")
