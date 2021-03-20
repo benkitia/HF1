@@ -184,7 +184,7 @@ class Logging(commands.Cog):
         if after.nick == None:
             after.nick = "[No nickname]"
         embed = discord.Embed(
-            description = f"{before.mention} updated their nickname:",
+            description = f"{before.mention}'s nickname was updated:",
             color = 0x00e3ff
         )
         embed.add_field(
