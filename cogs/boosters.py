@@ -46,6 +46,7 @@ class Boosters(commands.Cog):
         elif color == "blue":
             color = discord.utils.get(ctx.guild.roles, id = 737709713881301012)
         elif color == "purple":
+            await ctx.send("...")
             color = discord.utils.get(ctx.guild.coles, id = 760327521148600340)
         if color in ctx.message.author.roles:
             return await self.functions.handle_error(ctx, "You already have this color role")
@@ -64,7 +65,7 @@ class Boosters(commands.Cog):
         if before.roles == after.roles:
             return
         if booster_role not in after.roles:
-            await self.remove_all_color_roles(before, ctx.message.author, "Automatic color role removal")
+            await self.remove_all_color_roles(before, before, "Automatic color role removal")
 
 def setup(bot):
     bot.add_cog(Boosters(bot))
