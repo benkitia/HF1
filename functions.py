@@ -26,6 +26,17 @@ class Functions:
             embed.set_footer(text = additional_info)
         await ctx.send(embed = embed)
 
+    async def confirm_action_return_message(self, ctx, description : str, additional_info: str = None):
+        embed = discord.Embed(
+            description = description,
+            color = 0x43e286
+        )
+        embed.set_author(name = "Success")
+        if additional_info:
+            embed.set_footer(text = additional_info)
+        message = await ctx.send(embed = embed)
+        return message
+
     async def check_if_staff(self, ctx, user : discord.User):
         for staff_role in Config.staff_roles:
             staff_role = discord.utils.get(ctx.guild.roles, id = staff_role)

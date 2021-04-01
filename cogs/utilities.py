@@ -1,3 +1,4 @@
+import asyncio
 import discord
 from discord.ext import commands
 import time
@@ -27,6 +28,9 @@ class Utilities(commands.Cog):
 			return await self.functions.handle_error(ctx, "Unable to purge messages", "Make sure I have permission to manage messages in this channnel")
 		except discord.HTTPException:
 			return await self.functions.handle_error(ctx, "Unable to purge messages", "An unknown Dicord error occured. Try again later.")
+		confirmation_message = await self.functions.confirm_action_return_message(ctx, f"Cleared {amount} message(s)")
+		await asyncio.sleep(5)
+		await confirmation_message.delete()
 
 	@commands.command(description = "Returns information about a user", aliases = ['profile', 'info'])
 	async def userinfo(self, ctx, user_id = None):
