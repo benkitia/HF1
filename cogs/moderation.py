@@ -122,6 +122,18 @@ class Moderation(commands.Cog):
         except:
             return False
 
+    async def check_if_banned(self, ctx, target : discord.User, no_error : bool = False):
+        try:
+            await ctx.guild.fetch_ban(target)
+            is_banned = True
+        except discord.NotFound:
+            is_banned = False
+        if no_error:
+            return is_banned
+        if is_banned:
+            await self.functions.handle_error(ctx, "User is already banned")
+        return is_banned
+
     @commands.command()
     @commands.guild_only()
     async def ban(self, ctx, target: discord.User = None, *, reason = None):
@@ -135,6 +147,9 @@ class Moderation(commands.Cog):
         superior = await self.check_hierarchy(ctx, ctx.message.author, target)
         if not superior:
             return await self.functions.handle_error(ctx, "You don't have permission to ban this user", "Your highest role must be higher than theirs")
+        is_banned = await self.check_if_banned(ctx, target)
+        if is_banned:
+            return
         try:
             await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
         except:
@@ -189,6 +204,9 @@ class Moderation(commands.Cog):
         duration = dateparser.parse(f"in {duration}")
         if type(duration) != datetime:
             return await self.functions.handle_error(ctx, "Invalid duration", "Try 1h, 1d, etc.")
+        is_banned = await self.check_if_banned(ctx, target)
+        if is_banned:
+            return
         try:
             await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
         except:
@@ -259,6 +277,9 @@ class Moderation(commands.Cog):
         superior = await self.check_hierarchy(ctx, ctx.message.author, target)
         if not superior:
             return await self.functions.handle_error(ctx, "You don't have permission to ban this user", "Your highest role must be higher than theirs")
+        is_banned = await self.check_if_banned(ctx, target)
+        if is_banned:
+            return
         try:
             await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")        
         except:
@@ -335,6 +356,10 @@ class Moderation(commands.Cog):
                     continue
                 if not reason:
                     reason = "None"
+                is_banned = await self.check_if_banned(ctx, target, no_error = True)
+                if is_banned:
+                    not_bans.append(f"{target.mention} ({target.id}) - User is already banned")
+                    continue
                 try:
                     await ctx.guild.ban(target, reason=f"Action by {ctx.message.author} for {reason}")
                 except:
