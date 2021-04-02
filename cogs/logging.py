@@ -133,8 +133,13 @@ class Logging(commands.Cog):
             account_created = f"{account_created} ago"
         else:
             account_created = "today :warning:"
+        infraction_count = await self.db.infractions.count_documents({"target": str(member.id), "guild": str(member.guild.id), "status": "active"})
+        if infraction_count > 0:
+            infraction_count = f"\n{infraction_count} infraction(s) :warning:"
+        else:
+            infraction_count = ""
         embed = discord.Embed(
-            description = f"{member.mention} joined the server\nAccount created {account_created}", 
+            description = f"{member.mention} joined the server\nAccount created {account_created}{infraction_count}", 
             color = 0x298000
             )
         embed.set_thumbnail(url = member.avatar_url)
