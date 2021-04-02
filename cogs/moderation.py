@@ -1,3 +1,4 @@
+import asyncio
 import dateparser
 import datetime
 from datetime import datetime, date, time
@@ -48,7 +49,7 @@ class Moderation(commands.Cog):
         elif mod.top_role > target.top_role:
             return True
 
-    async def log_action(self, ctx, verb : str, color, target : discord.User, mod : discord.User, reason : str, icon_url : str, infraction_id : str = None, infraction_type : str = None, duration : str = None):
+    async def log_action(self, ctx, verb : str, color, target : discord.User, mod : discord.User, reason : str, icon_url : str, infraction_id : str = None, infraction_type : str = None, duration : str = None, expired : bool = True):
         if not self.config.moderation_log:
             return
         embed = discord.Embed(description = f"{target} {verb}", color = color)
@@ -91,7 +92,8 @@ class Moderation(commands.Cog):
             "reason": reason,
             "duration": duration,
             "status": "active",
-            "timestamp": datetime.utcnow()
+            "timestamp": datetime.utcnow(),
+            "expired": expired
         }
         await self.db.infractions.insert_one(infraction)
 
@@ -552,7 +554,8 @@ class Moderation(commands.Cog):
             duration = duration_pre_parse,
             icon_url = "https://i.postimg.cc/Tw8fhHqF/speaker-with-cancellation-stroke-1f507.png",
             infraction_id = infraction_id,
-            infraction_type = "mute"
+            infraction_type = "mute",
+            expired = False
         )
         while dateparser.parse("in 1s") < duration:
             await asyncio.sleep(1)
@@ -566,6 +569,7 @@ class Moderation(commands.Cog):
             reason = f"temporary mute {infraction_id} expired",
             icon_url = "https://i.postimg.cc/QNyS5GWF/speaker-with-three-sound-waves-1f50a.png"
         )
+        await self.db.infractions.update_one({"_id": infraction_id, "guild": str(ctx.message.guild.id)}, {"$set": {"expired": True}})
 
     @commands.command()
     @commands.guild_only()

@@ -110,6 +110,17 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        # checks if user is muted
+        active_mute = await self.db.infractions.find_one({"target": str(member.id), "guild": str(member.guild.id), "infraction_type": "mute", "expired": False})
+        if active_mute:
+            try:
+                mute_role = discord.utils.get(member.guild.roles, id = self.config.mute_role)
+            except:
+                print("Invalid mute role. Double check the mute role in the bot config file")        
+            try:
+                await member.add_roles(mute_role, reason=f"Mute evasion protection")        
+            except:
+                print("Make sure my role is above the mute role.")
         if not self.config.user_join_log:
             return
         try:
