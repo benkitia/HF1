@@ -462,6 +462,7 @@ class Moderation(commands.Cog):
         superior = await self.check_hierarchy(ctx, ctx.message.author, target)
         if not superior:
             return await self.functions.handle_error(ctx, "You don't have permission to kick this user", "Your highest role must be higher than theirs")
+        infraction_id = await self.generate_infraction_id()
         notified = await self.notify_target(
             ctx,
             infraction_type = "Kick",
@@ -476,7 +477,6 @@ class Moderation(commands.Cog):
             await ctx.guild.kick(target, reason=f"Action by {ctx.message.author} for {reason}")        
         except:
             return await self.functions.handle_error(ctx, "Unable to kick this user", "Make sure my role is above theirs and I have been granted kick members permissions")
-        infraction_id = await self.generate_infraction_id()
         await self.confirm_infraction(
             ctx,
             verb = "kicked",
