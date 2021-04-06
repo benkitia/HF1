@@ -164,7 +164,7 @@ class Moderation(commands.Cog):
             reason = reason,
             color = 0xff0000,
             guild = ctx.message.guild,
-            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            icon_url = "https://hair-force-one.s3.us-east-2.amazonaws.com/infraction-logging-thumbnails/ban.png",
             infraction_id = infraction_id
         )
         await self.confirm_infraction(
@@ -182,7 +182,7 @@ class Moderation(commands.Cog):
             mod = ctx.message.author,
             reason = reason,
             duration = "Indefinite",
-            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            icon_url = "https://hair-force-one.s3.us-east-2.amazonaws.com/infraction-logging-thumbnails/ban.png",
             infraction_id = infraction_id,
             infraction_type = "ban"
         )
@@ -221,7 +221,7 @@ class Moderation(commands.Cog):
             reason = reason,
             color = 0xff0000,
             guild = ctx.message.guild,
-            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            icon_url = "https://hair-force-one.s3.us-east-2.amazonaws.com/infraction-logging-thumbnails/ban.png",
             duration = duration_pre_parse,
             infraction_id = infraction_id
         )
@@ -240,7 +240,7 @@ class Moderation(commands.Cog):
             mod = ctx.message.author,
             reason = reason,
             duration = duration_pre_parse,
-            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            icon_url = "https://hair-force-one.s3.us-east-2.amazonaws.com/infraction-logging-thumbnails/ban.png",
             infraction_id = infraction_id,
             infraction_type = "tempban"
         )
@@ -294,7 +294,7 @@ class Moderation(commands.Cog):
             reason = reason,
             color = 0xff0000,
             guild = ctx.message.guild,
-            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            icon_url = "https://hair-force-one.s3.us-east-2.amazonaws.com/infraction-logging-thumbnails/ban.png",
             infraction_id = infraction_id
         )
         await self.confirm_infraction(
@@ -312,7 +312,7 @@ class Moderation(commands.Cog):
             mod = ctx.message.author,
             reason = reason,
             duration = "Indefinite",
-            icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+            icon_url = "https://hair-force-one.s3.us-east-2.amazonaws.com/infraction-logging-thumbnails/ban.png",
             infraction_id = infraction_id,
             infraction_type = "ban"
         )
@@ -377,7 +377,7 @@ class Moderation(commands.Cog):
                     reason = reason,
                     color = 0xff0000,
                     guild = ctx.message.guild,
-                    icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+                    icon_url = "https://hair-force-one.s3.us-east-2.amazonaws.com/infraction-logging-thumbnails/ban.png",
                     infraction_id = infraction_id
                 )
                 await self.log_action(
@@ -388,7 +388,7 @@ class Moderation(commands.Cog):
                     mod = ctx.message.author,
                     reason = reason,
                     duration = "Indefinite",
-                    icon_url = "https://i.postimg.cc/YCPNT1Mb/hammer-1f528-4.png",
+                    icon_url = "https://hair-force-one.s3.us-east-2.amazonaws.com/infraction-logging-thumbnails/ban.png",
                     infraction_id = infraction_id,
                     infraction_type = "ban"
                 )
@@ -470,7 +470,7 @@ class Moderation(commands.Cog):
             reason = reason,
             color = 0xf34141,
             guild = ctx.message.guild,
-            icon_url = "https://i.postimg.cc/DyG0gLmq/hiking-boot-1f97e.png",
+            icon_url = "https://hair-force-one.s3.us-east-2.amazonaws.com/infraction-logging-thumbnails/kick.png",
             infraction_id = infraction_id
         )
         try:
@@ -491,7 +491,7 @@ class Moderation(commands.Cog):
             target = target,
             mod = ctx.message.author,
             reason = reason,
-            icon_url = "https://i.postimg.cc/DyG0gLmq/hiking-boot-1f97e.png",
+            icon_url = "https://hair-force-one.s3.us-east-2.amazonaws.com/infraction-logging-thumbnails/kick.png",
             infraction_id = infraction_id,
             infraction_type = "kick"
         )
