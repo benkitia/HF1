@@ -21,7 +21,7 @@ class Boosters(commands.Cog):
                 if color_role in user.roles:
                     await user.remove_roles(color_role, reason = reason)
         except:
-            await self.functions.handle_error(ctx, "Unknown error in removing color roles", "Notify waffles or try again later")
+            return await self.functions.handle_error(ctx, "Unknown error in removing color roles", "Notify waffles or try again later")
 
     @commands.command(description="Assigns a color for Nitro Boosters",aliases=['colors','colour','colours'])
     async def color(self, ctx, color):
@@ -31,7 +31,7 @@ class Boosters(commands.Cog):
         accepted_colors = ['red','orange','yellow','green','blue','purple','remove']
         color = color.lower()
         if color not in accepted_colors:
-            await self.functions.handle_error(ctx, "Invalid color", "Valid colors include red, orange, yellow, green, blue, and purple. If you want to remove all color roles, use !color remove")
+            return await self.functions.handle_error(ctx, "Invalid color", "Valid colors include red, orange, yellow, green, blue, and purple. If you want to remove all color roles, use !color remove")
         if color == "remove":
             await self.remove_all_color_roles(ctx, ctx.message.author, "Manual color role removal")
             return await self.functions.confirm_action(ctx, "Any color roles assigned to you have been removed")
