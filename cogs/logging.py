@@ -235,7 +235,14 @@ class Logging(commands.Cog):
             else:
                 message_content = ctx.message.content
             message_author = f"{message.author} ({message.author.id})"
-            log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message.content}")
+            log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message_content}")
+            if message.attachments:
+                message_attachments = message.attachments
+                for message_attachment in message_attachments:
+                    if not message_attachment.url.endswith((".jpg", ".jpeg", ".png", ".gif", ".wepb", ".mp4", ".mov", ".wmv", ".avi", ".txt", ".docx", ".csv", ".xlxs")):
+                        log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message_attachment.filename}")
+                    else:
+                        log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message_attachment.filename}: {message_attachment.proxy_url}")
         log.close()
         embed = discord.Embed(
             description = f"{len(messages)} message(s) were deleted in bulk from {messages[0].channel.mention}.\nView them in the attached file",
