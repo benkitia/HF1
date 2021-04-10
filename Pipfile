@@ -16,6 +16,7 @@ asyncio = "*"
 discord = "*"
 dateparser = "*"
 pause = "*"
+jishaku = "*"
 
 [requires]
 python_version = "3.8"
