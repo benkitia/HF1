@@ -27,7 +27,7 @@ class HF1(commands.Bot):
 
 	def __init__(self):
 		super().__init__(
-			command_prefix='>',
+			command_prefix='!',
 			description="A simple yet powerful moderation bot. Written in discord.py",
 			intents=intents
 		)
