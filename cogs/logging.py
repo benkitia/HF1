@@ -230,10 +230,10 @@ class Logging(commands.Cog):
         log_id = str(random.randint(1000000000, 9999999999))
         log = open(f"temp/bulk_message_delete_log_{log_id}.txt","w")
         for message in messages:
-            if not ctx.message.content:
+            if not message.content:
                 message_content = "[No Content]"
             else:
-                message_content = ctx.message.content
+                message_content = message.content
             message_author = f"{message.author} ({message.author.id})"
             log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message_content}")
             if message.attachments:
