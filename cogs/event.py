@@ -13,8 +13,6 @@ class Event(commands.Cog):
         ctx: commands.Context = await self.bot.get_context(message)
         if ctx.message.channel.id != 822206729445048342:
             return
-        if ctx.message.author.id == 508350582457761813 or self.bot.user.id:
-            return
         if ctx.message.content:
             return await ctx.message.delete()
         if len(ctx.message.attachments) != 1:
