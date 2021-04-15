@@ -24,13 +24,9 @@ class Utilities(commands.Cog):
         timestamp = infraction["timestamp"]
         status = infraction["status"]
         duration = infraction["duration"]
-        if infraction_type == "ban":
+        if infraction_type in ["ban", "tempban"]:
             color = 0xff0000
-        elif infraction_type == "tempban":
-            color = 0xff0000
-        elif infraction_type == "kick":
-            color = 0xf34141
-        elif infraction_type == "mute":
+        elif infraction_type in ["kick", "mute"]:
             color = 0xf34141
         elif infraction_type == "warning":
             color = 0xfff25f

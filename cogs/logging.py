@@ -164,10 +164,7 @@ class Logging(commands.Cog):
             print(f"Unable to log user {member.id} leaving because the provided user_leave_log channel ID was invalid.\n__________")
         joined = str((datetime.datetime.utcfromtimestamp(time.time()) - member.joined_at))
         joined = joined.split(',')[0]
-        if "days" in joined.lower():
-            joined = f"{joined} ago"
-        else:
-            joined = "today"
+        joined = f"{joined} ago" if "days" in joined.lower() else "today"
         embed = discord.Embed(
             description = f"{member.mention} left the server\nJoined {joined}", 
             color = 0xFF7FFF
@@ -195,9 +192,9 @@ class Logging(commands.Cog):
             channel = discord.utils.get(member.guild.text_channels, id = self.config.user_nickname_log)
         except:
             print(f"Unable to log user {member.id} leaving because the provided user_nickname_log channel ID was invalid.\n__________")
-        if before.nick == None:
+        if before.nick is None:
             before.nick = "[No nickname]"
-        if after.nick == None:
+        if after.nick is None:
             after.nick = "[No nickname]"
         embed = discord.Embed(
             description = f"{before.mention}'s nickname was updated:",
@@ -228,22 +225,18 @@ class Logging(commands.Cog):
         except:
             print(f"Unable to log deletion of message {ctx.message.id} because the provided message_delete_log channel ID was invalid.\n__________")
         log_id = str(random.randint(1000000000, 9999999999))
-        log = open(f"temp/bulk_message_delete_log_{log_id}.txt","w")
-        for message in messages:
-            if not message.content:
-                message_content = "[No Content]"
-            else:
-                message_content = message.content
-            message_author = f"{message.author} ({message.author.id})"
-            log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message_content}")
-            if message.attachments:
-                message_attachments = message.attachments
-                for message_attachment in message_attachments:
-                    if not message_attachment.url.endswith((".jpg", ".jpeg", ".png", ".gif", ".wepb", ".mp4", ".mov", ".wmv", ".avi", ".txt", ".docx", ".csv", ".xlxs")):
-                        log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message_attachment.filename}")
-                    else:
-                        log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message_attachment.filename}: {message_attachment.proxy_url}")
-        log.close()
+        with open(f"temp/bulk_message_delete_log_{log_id}.txt","w") as log:
+            for message in messages:
+                message_content = "[No Content]" if not message.content else message.content
+                message_author = f"{message.author} ({message.author.id})"
+                log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message_content}")
+                if message.attachments:
+                    message_attachments = message.attachments
+                    for message_attachment in message_attachments:
+                        if not message_attachment.url.endswith((".jpg", ".jpeg", ".png", ".gif", ".wepb", ".mp4", ".mov", ".wmv", ".avi", ".txt", ".docx", ".csv", ".xlxs")):
+                            log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message_attachment.filename}")
+                        else:
+                            log.write(f"\n{message.id} - {message_author} at {message.created_at}: {message_attachment.filename}: {message_attachment.proxy_url}")
         embed = discord.Embed(
             description = f"{len(messages)} message(s) were deleted in bulk from {messages[0].channel.mention}.\nView them in the attached file",
             color = 0xb14c00

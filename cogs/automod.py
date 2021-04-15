@@ -12,7 +12,7 @@ class Automod(commands.Cog):
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         if before.nick == after.nick:
             return
-        if after.nick == None:
+        if after.nick is None:
             return
         if not self.config.auto_dehoist:
             return
