@@ -34,7 +34,7 @@ class Utilities(commands.Cog):
 
 	@commands.command(description = "Returns information about a user", aliases = ['profile', 'info'])
 	async def userinfo(self, ctx, user_id = None):
-		if user_id == None:
+		if user_id is None:
 			user_id = ctx.message.author.id
 		try: 
 			user = await self.bot.fetch_user(int(user_id))
@@ -94,7 +94,7 @@ class Utilities(commands.Cog):
 
 	@commands.command(description = "Returns a user's avatar in one of many formats", aliases = ['avi'])
 	async def avatar(self, ctx, user:  discord.Member = None, avatar_format = 'png'):
-		if user == None:
+		if user is None:
 			user = ctx.message.author
 		try:
 			avi = user.avatar_url_as(format = avatar_format)
@@ -118,10 +118,7 @@ class Utilities(commands.Cog):
 
 	@commands.command(description = "Returns information about a server", aliases = ['server'])
 	async def serverinfo(self, ctx, guild_id : int = None):
-		if not guild_id:
-			guild = ctx.message.guild
-		else:
-			guild = self.bot.get_guild(guild_id)
+		guild = ctx.message.guild if not guild_id else self.bot.get_guild(guild_id)
 		embed = discord.Embed(title=guild.name, color=0xFED870)
 		embed.add_field(
 			name = "Guild ID",
@@ -214,9 +211,8 @@ class Utilities(commands.Cog):
 			except discord.Forbidden:
 				return await self.functions.handle_error(ctx, "Unable to remove role", "Make sure my highest role is above it and I have manage roles permissions")
 			await self.functions.confirm_action(ctx, f"Removed role {role.name} from {target.mention}")
-		if add_or_remove != "add":
-			if add_or_remove != "remove":
-				return await self.functions.handle_error(ctx, "Specify add or remove")
+		if add_or_remove not in ["add", "remove"]:
+			return await self.functions.handle_error(ctx, "Specify add or remove")
 
 def setup(bot):
 	bot.add_cog(Utilities(bot))
