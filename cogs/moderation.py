@@ -22,10 +22,7 @@ class Moderation(commands.Cog):
             color = 0x43e286
         )
         embed.set_author(name = "Infraction Submitted Successfully")
-        if not notified:
-            notified = "Unable to notify user"
-        else:
-            notified = "User notified"
+        notified = "Unable to notify user" if not notified else "User notified"
         if not infraction_id:
             infraction_id = ''
         embed.set_footer(text = f"{infraction_id} • {notified}")
@@ -44,10 +41,7 @@ class Moderation(commands.Cog):
             return True
         if target not in ctx.guild.members:
             return True
-        if mod.top_role <= target.top_role:
-            return False
-        elif mod.top_role > target.top_role:
-            return True
+        return mod.top_role > target.top_role
 
     async def log_action(self, ctx, verb : str, color, target : discord.User, mod : discord.User, reason : str, icon_url : str, infraction_id : str = None, infraction_type : str = None, duration : str = None, expired : bool = True):
         if not self.config.moderation_log:
@@ -142,7 +136,7 @@ class Moderation(commands.Cog):
         staff = await self.functions.check_if_staff(ctx, ctx.message.author)
         if not staff:
             return
-        if target == None:
+        if target is None:
             return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
         if target == ctx.message.author:
             return await self.functions.handle_error(ctx, "You can't ban yourself")
@@ -193,9 +187,9 @@ class Moderation(commands.Cog):
         staff = await self.functions.check_if_staff(ctx, ctx.message.author)
         if not staff:
             return
-        if target == None:
+        if target is None:
             return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
-        if duration == None:
+        if duration is None:
             return await self.functions.handle_error(ctx, "Invalid duration", "Try 1h, 1d, etc.")
         if target == ctx.message.author:
             return await self.functions.handle_error(ctx, "You can't ban yourself")
@@ -264,7 +258,7 @@ class Moderation(commands.Cog):
         staff = await self.functions.check_if_staff(ctx, ctx.message.author)
         if not staff:
             return
-        if target_id == None:
+        if target_id is None:
             return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
         try:
             target_id = int(target_id)
@@ -455,7 +449,7 @@ class Moderation(commands.Cog):
         staff = await self.functions.check_if_staff(ctx, ctx.message.author)
         if not staff:
             return
-        if target == None:
+        if target is None:
             return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
         if target == ctx.message.author:
             return await self.functions.handle_error(ctx, "You can't kick yourself")
@@ -502,9 +496,9 @@ class Moderation(commands.Cog):
         staff = await self.functions.check_if_staff(ctx, ctx.message.author)
         if not staff:
             return
-        if target == None:
+        if target is None:
             return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
-        if duration == None:
+        if duration is None:
             return await self.functions.handle_error(ctx, "Invalid duration", "Try 1h, 1d, etc.")
         if target == ctx.message.author:
             return await self.functions.handle_error(ctx, "You can't mute yourself")
@@ -559,7 +553,7 @@ class Moderation(commands.Cog):
         )
         while dateparser.parse("in 1s") < duration:
             await asyncio.sleep(1)
-        await target.remove_roles(mute_role, reason=f"Temporary mute {infraction_id} expired")        
+        await target.remove_roles(mute_role, reason=f"Temporary mute {infraction_id} expired")
         await self.log_action(
             ctx,
             verb = "automatically unmuted",
@@ -577,7 +571,7 @@ class Moderation(commands.Cog):
         staff = await self.functions.check_if_staff(ctx, ctx.message.author)
         if not staff:
             return
-        if target == None:
+        if target is None:
             return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
         if target == ctx.message.author:
             return await self.functions.handle_error(ctx, "You can't unmute yourself")
@@ -624,7 +618,7 @@ class Moderation(commands.Cog):
         staff = await self.functions.check_if_staff(ctx, ctx.message.author)
         if not staff:
             return
-        if target == None:
+        if target is None:
             return await self.functions.handle_error(ctx, "Invalid target", "Try @mentioning the user, or make sure you have the right ID")
         if target == ctx.message.author:
             return await self.functions.handle_error(ctx, "You can't kick yourself")
