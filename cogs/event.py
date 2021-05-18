@@ -7,11 +7,12 @@ class Event(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.config = bot.config
 
     @commands.Cog.listener()
     async def on_message(self, message):
         ctx: commands.Context = await self.bot.get_context(message)
-        if ctx.message.channel.id != 822206729445048342:
+        if ctx.message.channel.id != self.config.photo_of_the_week_channel:
             return
         if ctx.message.content:
             return await ctx.message.delete()
