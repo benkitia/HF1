@@ -14,6 +14,7 @@ class Config:
     user_join_log = 707867871765594142
     user_leave_log = 707867871765594142
     user_nickname_log = 707867871765594142
+    photo_of_the_week_channel = 844261014630694942
 
 
     mute_role = 410604540568666132
