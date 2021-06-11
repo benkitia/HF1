@@ -15,7 +15,7 @@ class Admin(commands.Cog):
         except commands.ExtensionError as e:
             await self.functions.handle_error(ctx, f"Failed to load module {module}", f"{e.__class__.__name__}: {e}")
         else:
-            await self.functions.confirm_action(ctx, f"Loaded extension: {module}")
+            await ctx.send(f"Loaded extension: {module}")
 
     @commands.command(hidden = True)
     @commands.is_owner()
@@ -25,7 +25,7 @@ class Admin(commands.Cog):
         except commands.ExtensionError as e:
             await self.functions.handle_error(ctx, f"Failed to load module {module}", f"{e.__class__.__name__}: {e}")
         else:
-            await self.functions.confirm_action(ctx, f"Unloaded extension: {module}")
+            await ctx.send(f"Unloaded extension: {module}")
 
     @commands.command(hidden=True)
     @commands.is_owner()
@@ -35,7 +35,7 @@ class Admin(commands.Cog):
         except commands.ExtensionError as e:
             await self.functions.handle_error(ctx, f"Failed to reload module {module}", f"{e.__class__.__name__}: {e}")
         else:
-            await self.functions.confirm_action(ctx, f"Reload extension: {module}")
+            await ctx.send(f"Reload extension: {module}")
 
     @commands.command(hidden = True)
     @commands.is_owner()
@@ -46,12 +46,12 @@ class Admin(commands.Cog):
     @commands.command(hidden = True)
     async def setpresence(self, ctx, activity_type: int, *, presence: str):
         await self.bot.change_presence(activity = discord.Activity(name = presence, type = activity_type))
-        await self.functions.confirm_action(ctx, f"Set presence to {presence}")
+        await ctx.send(f"Set presence to {presence}")
 
     @commands.command(aliases = ['logout'], hidden = True)
     @commands.is_owner()
     async def close(self, ctx):
-        await self.functions.confirm_action(ctx, "Logging out...")
+        await ctx.send("Logging out...")
         await self.bot.close()
 
     @commands.command(hidden = True)
@@ -71,10 +71,41 @@ class Admin(commands.Cog):
             return await self.functions.handle_error(ctx, "Invalid guild", "Make sure you have the correct guild ID")
         try:
             await guild.leave()
-            await self.functions.confirm_action(ctx, f"Left guild: {guild.name}")
+            await ctx.send(f"Left guild: {guild.name}")
         except:
             return await self.functions.handle_error(ctx, "Unable to leave guild")
 
+    @commands.command()
+    @commands.is_owner()
+    async def lookup_document(self, ctx, collection : str, document_id : str):
+        if collection == "infractions":
+            collection = self.db.infractions
+        document = await collection.find_one({"_id" : document_id})
+        await ctx.send(f"```{document}```")
+        await ctx.send(type(document))
+
+    @commands.command()
+    @commands.is_owner()
+    async def update_document(self, ctx, collection : str, document_id : str, field : str, new_value):
+        if collection == "infractions":
+            collection = self.db.infractions
+        await collection.update_one({"_id" : document_id}, {"$set": {field : new_value}})
+        await ctx.send(f"Updated document {document_id}:\nSet {field} to {new_value}")
+
+    @commands.command()
+    @commands.is_owner()
+    async def delete_document(self, ctx, collection : str, document_id : str):
+        if collection == "infractions":
+            collection = self.db.infractions
+        await collection.delete_one({"_id" : document_id})
+        await ctx.send(f"Deleted document {document_id}")
+
+    @commands.command()
+    @commands.is_owner()
+    async def insert_document(self, ctx, collection: str, document : dict):
+        if collection == "infractions":
+            collection = self.db.infractions
+        await collection.insert_one(document)
 
 def setup(bot):
     bot.add_cog(Admin(bot))
