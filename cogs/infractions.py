@@ -16,7 +16,7 @@ class Utilities(commands.Cog):
             return
         if len(infraction_id) != 12:
             return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction IDs are 12 characters")
-        infraction = await self.db.infractions.find_one({"_id": infraction_id, "guild": str(ctx.message.guild.id)})
+        infraction = await self.db.infractions.find_one({"_id": infraction_id})
         target_id = infraction["target"]
         infraction_type = infraction["infraction_type"]
         mod_id = infraction["mod"]
@@ -93,13 +93,11 @@ class Utilities(commands.Cog):
         except:
             await self.functions.handle_error(ctx, "Invalid user", "This command only accepts user IDs")
         infractions = self.db.infractions.find({
-            "target": str(user.id),
-            "guild": str(ctx.message.guild.id),
+            "target": user.id,
             "status": "active"
         }).sort("timestamp", pymongo.DESCENDING)
         infraction_count = await self.db.infractions.count_documents({
-            "target": str(user.id),
-            "guild": str(ctx.message.guild.id),
+            "target": user.id,
             "status": "active"
         })
         if infraction_count >= 25:
@@ -134,12 +132,10 @@ class Utilities(commands.Cog):
         except:
             await self.functions.handle_error(ctx, "Invalid user", "This command only accepts user IDs")
         infractions = self.db.infractions.find({
-            "target": str(user.id),
-            "guild": str(ctx.message.guild.id),
+            "target": user.id
         }).sort("timestamp", pymongo.DESCENDING)
         infraction_count = await self.db.infractions.count_documents({
-            "target": str(user.id),
-            "guild": str(ctx.message.guild.id)
+            "target": user.id
         })
         if infraction_count >= 25:
             warning = "Only the most recent infractions may be displayed"
@@ -170,11 +166,11 @@ class Utilities(commands.Cog):
             return
         if len(infraction_id) != 12:
             return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction IDs are 12 characters")
-        infraction = await self.db.infractions.find_one({"_id": infraction_id, "guild": str(ctx.message.guild.id)})
+        infraction = await self.db.infractions.find_one({"_id": infraction_id})
         if not infraction:
             return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction not found")
         try:
-            await self.db.infractions.update_one({"_id": infraction_id, "guild": str(ctx.message.guild.id)}, {"$set": {"reason": reason}})
+            await self.db.infractions.update_one({"_id": infraction_id}, {"$set": {"reason": reason}})
         except:
             return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction not found")
         await self.functions.confirm_action(ctx, "Infraction reason updated")
@@ -186,11 +182,11 @@ class Utilities(commands.Cog):
             return
         if len(infraction_id) != 12:
             return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction IDs are 12 characters")
-        infraction = await self.db.infractions.find_one({"_id": infraction_id, "guild": str(ctx.message.guild.id)})
+        infraction = await self.db.infractions.find_one({"_id": infraction_id})
         if not infraction:
             return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction not found")
         try:
-            await self.db.infractions.update_one({"_id": infraction_id, "guild": str(ctx.message.guild.id)}, {"$set": {"status": "inactive"}})
+            await self.db.infractions.update_one({"_id": infraction_id}, {"$set": {"status": "inactive"}})
         except:
             return await self.functions.handle_error(ctx, "Invalid infraction ID", "infraction not found")
         await self.functions.confirm_action(ctx, "infraction removed")
@@ -200,7 +196,7 @@ class Utilities(commands.Cog):
         staff = await self.functions.check_if_staff(ctx, ctx.message.author)
         if not staff:
             return
-        await self.db.infractions.update_many({"target": str(target.id), "guild": str(ctx.message.guild.id), "status": "active"}, {"$set": {"status": "inactive"}})
+        await self.db.infractions.update_many({"target": target.id, "status": "active"}, {"$set": {"status": "inactive"}})
         await self.functions.confirm_action(ctx, "infractions cleared")
 
 
