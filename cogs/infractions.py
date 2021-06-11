@@ -93,11 +93,11 @@ class Utilities(commands.Cog):
         except:
             await self.functions.handle_error(ctx, "Invalid user", "This command only accepts user IDs")
         infractions = self.db.infractions.find({
-            "target": user.id,
+            "target": str(user.id),
             "status": "active"
         }).sort("timestamp", pymongo.DESCENDING)
         infraction_count = await self.db.infractions.count_documents({
-            "target": user.id,
+            "target": str(user.id),
             "status": "active"
         })
         if infraction_count >= 25:
@@ -132,10 +132,10 @@ class Utilities(commands.Cog):
         except:
             await self.functions.handle_error(ctx, "Invalid user", "This command only accepts user IDs")
         infractions = self.db.infractions.find({
-            "target": user.id
+            "target": str(user.id)
         }).sort("timestamp", pymongo.DESCENDING)
         infraction_count = await self.db.infractions.count_documents({
-            "target": user.id
+            "target": str(user.id)
         })
         if infraction_count >= 25:
             warning = "Only the most recent infractions may be displayed"
