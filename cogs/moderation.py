@@ -102,9 +102,9 @@ class Moderation(commands.Cog):
 			if infraction_id:
 				embed_public.set_footer(text = infraction_id)
 			embed_public.timestamp = datetime.utcnow()
-			private_inf_log = discord.utils.get(ctx.guild.text_channels, id = self.config.private_inf_log)
+			public_inf_log = discord.utils.get(ctx.guild.text_channels, id = self.config.public_inf_log)
 			ping = target.mention if not notified else None
-			await private_inf_log.send(ping, embed = embed_public)
+			await public_inf_log.send(ping, embed = embed_public)
 
 	async def store_infraction(self, ctx, infraction_id : str, infraction_type : str, target : discord.User, mod : discord.User, reason : str, duration : str = None, status : str = "active"):
 		infraction = {
