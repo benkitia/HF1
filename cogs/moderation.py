@@ -496,7 +496,7 @@ class Moderation(commands.Cog):
 			verb = "unmuted",
 			target = target,
 			mod = ctx.message.author,
-			reason = reason,
+			reason = f"Temporary mute {infraction_id} expired",
 			infraction_type = "unmute",
 			notified = notified
 		)
