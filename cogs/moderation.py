@@ -110,8 +110,8 @@ class Moderation(commands.Cog):
 		infraction = {
 			"_id" : infraction_id,
 			"infraction_type" : infraction_type,
-			"target" : int(target.id),
-			"mod" : int(mod.id),
+			"target" : str(target.id),
+			"mod" : str(mod.id),
 			"reason" : reason,
 			"status" : status,
 			"duration" : duration,
