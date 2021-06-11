@@ -218,7 +218,7 @@ class Moderation(commands.Cog):
 			target = await self.bot.fetch_user(target_id)
 		except:
 			return await ctx.send("Make sure you have the right user ID")
-		is_banned = await self.check_if_banned(ctx, target)
+		is_banned = await self.check_if_banned(ctx, target, no_error = True)
 		if not is_banned:
 			return await ctx.send("User is not banned")
 		try:
