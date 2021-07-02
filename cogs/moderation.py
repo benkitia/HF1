@@ -138,6 +138,11 @@ class Moderation(commands.Cog):
 				name = "Infraction ID",
 				value = infraction_id
 			)
+		if infraction_type == "ban":
+			embed.add_field(
+				name = "Appeal",
+				value = "If you believe this ban is unjust, click here to appeal: https://discord.gg/PuXhxYTKu8"
+			)
 		embed.set_author(
 			name = ctx.message.guild.name,
 			icon_url = ctx.message.guild.icon_url
