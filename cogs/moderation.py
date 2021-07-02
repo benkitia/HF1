@@ -265,7 +265,7 @@ class Moderation(commands.Cog):
 		try:
 			await ctx.guild.ban(target, reason = f"By {ctx.message.author}: {reason}")
 		except:
-			await ctx.send("Error banning user")
+			return await ctx.send("Error banning user")
 		await self.log_infraction(
 			ctx,
 			verb = "banned",
