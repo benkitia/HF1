@@ -176,7 +176,7 @@ class Moderation(commands.Cog):
 			return await self.ctx.send("You don't have permission to ban that user")
 		is_banned = await self.check_if_banned(ctx, target)
 		if is_banned:
-			return await ctx.send("User is already banned")
+			return
 		infraction_id = await self.generate_infraction_id()
 		notified = await self.notify_target(
 			ctx,
@@ -260,7 +260,7 @@ class Moderation(commands.Cog):
 			return await self.ctx.send("You don't have permission to ban that user")
 		is_banned = await self.check_if_banned(ctx, target)
 		if is_banned:
-			return await ctx.send("User is already banned")
+			return
 		infraction_id = await self.generate_infraction_id()
 		try:
 			await ctx.guild.ban(target, reason = f"By {ctx.message.author}: {reason}")
